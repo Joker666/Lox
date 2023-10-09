@@ -1,0 +1,30 @@
+package tools
+
+import Expr
+import Token
+
+fun main(args: Array<String>) {
+    val expression = Expr.Binary(
+        Expr.Unary(Token(TokenType.MINUS, "-", null, 1), Expr.Literal(123)),
+        Token(TokenType.STAR, "*", null, 1),
+        Expr.Grouping(Expr.Literal(45.67))
+    )
+
+    println(prettify(expression))
+}
+
+// prettify an expression
+private fun prettify(expr: Expr): String = when (expr) {
+    is Expr.Binary -> parenthesize(expr.operator.lexeme, expr.left, expr.right)
+    is Expr.Grouping -> parenthesize("group", expr.expression)
+    is Expr.Literal -> if (expr.value == null) "nil" else expr.value.toString()
+    is Expr.Unary -> parenthesize(expr.operator.lexeme, expr.right)
+    is Expr.Variable -> parenthesize(expr.name.lexeme)
+    else -> ""
+}
+
+private fun parenthesize(name: String, vararg expressions: Expr): String {
+    val expressionStrings = expressions.map { expr -> prettify(expr) }
+    val concatenatedExpressions = expressionStrings.reduce { acc, expr -> "$acc $expr" }
+    return "($name $concatenatedExpressions)"
+}
