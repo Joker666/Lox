@@ -11,7 +11,7 @@ var hadError: Boolean = false
 
 fun main(args: Array<String>) {
     if (args.size > 1) {
-        println("Usage: jlox [script]")
+        println("Usage: klox [script]")
         exitProcess(64)
     } else if (args.size == 1) {
         runFile(args[0])
