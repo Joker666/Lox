@@ -32,7 +32,7 @@ object Lox {
         if (hadError) exitProcess(65)
     }
 
-    private fun run(source: String) {
+    fun run(source: String) {
         val scanner = Scanner(source)
         val tokens = scanner.scanTokens()
 

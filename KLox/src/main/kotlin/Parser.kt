@@ -123,7 +123,6 @@ internal class Parser(private val tokens: List<Token>) {
                 advance()
                 return true
             }
-            return true
         }
         return false
     }
