@@ -83,6 +83,30 @@ internal class Parser(private val tokens: List<Token>) {
 
     /// Helper Methods -----------------------------------------
 
+    // advance to the next token and synchronize if necessary
+    private fun synchronize() {
+        advance()
+        while (!isAtEnd()) {
+            // After a semicolon, we’re probably finished with a statement
+            if (previous().type === SEMICOLON) return
+
+            // Most statements start with a keyword—for, if, return, var, etc. When the next token
+            // is any of those, we’re probably about to start a statement.
+            when (current().type) {
+                CLASS,
+                FUN,
+                VAR,
+                FOR,
+                IF,
+                WHILE,
+                PRINT,
+                RETURN -> return
+                else -> {}
+            }
+            advance()
+        }
+    }
+
     // match the given token types and advance if they are found
     private fun match(vararg types: TokenType): Boolean {
         for (type in types) {
