@@ -3,7 +3,15 @@ import TokenType.*
 internal class Parser(private val tokens: List<Token>) {
     private class ParseError : RuntimeException()
 
-    private var current = 0
+    private var index = 0
+
+    fun parse(): Expr? {
+        return try {
+            expression()
+        } catch (error: ParseError) {
+            null
+        }
+    }
 
     private fun expression(): Expr {
         return equality()
@@ -101,9 +109,10 @@ internal class Parser(private val tokens: List<Token>) {
                 WHILE,
                 PRINT,
                 RETURN -> return
-                else -> {}
+                else -> {
+                    advance()
+                }
             }
-            advance()
         }
     }
 
@@ -130,7 +139,7 @@ internal class Parser(private val tokens: List<Token>) {
     // with the previous token as the left operand and the current token as the right operand.
     // this is done in the equality() method, which is called recursively.
     private fun advance(): Token {
-        if (!isAtEnd()) current++
+        if (!isAtEnd()) index++
         return previous()
     }
 
@@ -147,12 +156,12 @@ internal class Parser(private val tokens: List<Token>) {
 
     // return the current token
     private fun current(): Token {
-        return tokens[current]
+        return tokens[index]
     }
 
     // return the previous token
     private fun previous(): Token {
-        return tokens[current - 1]
+        return tokens[index - 1]
     }
 
     private fun error(token: Token, message: String): ParseError {
