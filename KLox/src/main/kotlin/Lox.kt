@@ -1,3 +1,4 @@
+import tools.PrettyAST
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -35,9 +36,13 @@ object Lox {
         val scanner = Scanner(source)
         val tokens = scanner.scanTokens()
 
-        for (token in tokens) {
-            println(token)
-        }
+        val parser = Parser(tokens)
+        val expression = parser.parse()
+
+        // Stop if there was a syntax error.
+        if (hadError) return
+
+        expression?.let { PrettyAST.print(it) }
     }
 
     fun error(line: Int, message: String) {
