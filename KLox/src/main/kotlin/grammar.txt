@@ -7,3 +7,15 @@ unary          → ( "!" | "-" ) unary
                | primary ;
 primary        → NUMBER | STRING | "true" | "false" | "nil"
                | "(" expression ")" ;
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+Grammar notation        Code representation
+---------------------------------------------------------
+Terminal	            Code to match and consume a token
+Nonterminal	            Call to that rule’s function
+|	                    If or switch statement
+* or +	                While or for loop
+?	                    If statement
