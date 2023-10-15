@@ -24,6 +24,10 @@ class Interpreter {
                     }
                     TokenType.STAR -> left as Double * right as Double
                     TokenType.SLASH -> left as Double / right as Double
+                    TokenType.GREATER -> left as Double > right as Double
+                    TokenType.GREATER_EQUAL -> left as Double >= right as Double
+                    TokenType.LESS -> (left as Double) < right as Double
+                    TokenType.LESS_EQUAL -> left as Double <= right as Double
                     else -> null
                 }
             }
