@@ -28,6 +28,8 @@ class Interpreter {
                     TokenType.GREATER_EQUAL -> left as Double >= right as Double
                     TokenType.LESS -> (left as Double) < right as Double
                     TokenType.LESS_EQUAL -> left as Double <= right as Double
+                    TokenType.BANG_EQUAL -> !isEqual(left, right)
+                    TokenType.EQUAL_EQUAL -> isEqual(left, right)
                     else -> null
                 }
             }
@@ -40,5 +42,12 @@ class Interpreter {
             null -> false
             is Boolean -> this
             else -> true
+        }
+
+    private fun isEqual(a: Any?, b: Any?): Boolean =
+        when {
+            a == null && b == null -> true
+            a == null -> false
+            else -> a == b
         }
 }
