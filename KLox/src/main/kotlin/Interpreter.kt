@@ -1,4 +1,25 @@
+import kotlin.math.floor
+
 class Interpreter {
+    fun interpret(expression: Expr?) {
+        try {
+            val value = evaluate(expression!!)
+            println(stringify(value))
+        } catch (error: RuntimeError) {
+            Lox.runtimeError(error)
+        }
+    }
+
+    private fun stringify(obj: Any?): String =
+        when (obj) {
+            null -> "nil"
+            is Double ->
+                if (floor(obj) == obj) { // convert 5.0 => 5
+                    obj.toInt().toString()
+                } else obj.toString()
+            else -> obj.toString()
+        }
+
     private fun evaluate(expr: Expr): Any? =
         when (expr) {
             is Expr.Literal -> expr.value

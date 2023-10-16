@@ -10,6 +10,7 @@ import kotlin.system.exitProcess
 
 object Lox {
     private var hadError: Boolean = false
+    private var hadRuntimeError = false
 
     @Throws(IOException::class)
     fun runPrompt() {
@@ -55,6 +56,17 @@ object Lox {
         } else {
             report(token.line, " at '" + token.lexeme + "'", message!!)
         }
+    }
+
+    fun runtimeError(error: RuntimeError) {
+        System.err.println(
+            """
+            ${error.message}
+            [line ${error.token.line}]
+            """
+                .trimIndent()
+        )
+        hadRuntimeError = true
     }
 
     private fun report(line: Int, where: String, message: String) {
