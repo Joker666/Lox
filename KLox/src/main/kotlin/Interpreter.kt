@@ -15,19 +15,44 @@ class Interpreter {
                 val left = evaluate(expr.left)
                 val right = evaluate(expr.right)
                 when (expr.operator.type) {
-                    TokenType.MINUS -> left as Double - right as Double
+                    TokenType.MINUS -> {
+                        checkNumberOperands(expr.operator, left, right)
+                        left as Double - right as Double
+                    }
                     TokenType.PLUS -> {
                         if (left is Double && right is Double) left + right // Handle numbers
                         else if (left is String && right is String)
                             left + right // Handle string concatenation
-                        else null
+                        else
+                            throw RuntimeError(
+                                expr.operator,
+                                "Operands must be numbers or strings."
+                            )
                     }
-                    TokenType.STAR -> left as Double * right as Double
-                    TokenType.SLASH -> left as Double / right as Double
-                    TokenType.GREATER -> left as Double > right as Double
-                    TokenType.GREATER_EQUAL -> left as Double >= right as Double
-                    TokenType.LESS -> (left as Double) < right as Double
-                    TokenType.LESS_EQUAL -> left as Double <= right as Double
+                    TokenType.STAR -> {
+                        checkNumberOperands(expr.operator, left, right)
+                        left as Double * right as Double
+                    }
+                    TokenType.SLASH -> {
+                        checkNumberOperands(expr.operator, left, right)
+                        left as Double / right as Double
+                    }
+                    TokenType.GREATER -> {
+                        checkNumberOperands(expr.operator, left, right)
+                        left as Double > right as Double
+                    }
+                    TokenType.GREATER_EQUAL -> {
+                        checkNumberOperands(expr.operator, left, right)
+                        left as Double >= right as Double
+                    }
+                    TokenType.LESS -> {
+                        checkNumberOperands(expr.operator, left, right)
+                        (left as Double) < right as Double
+                    }
+                    TokenType.LESS_EQUAL -> {
+                        checkNumberOperands(expr.operator, left, right)
+                        left as Double <= right as Double
+                    }
                     TokenType.BANG_EQUAL -> !isEqual(left, right)
                     TokenType.EQUAL_EQUAL -> isEqual(left, right)
                     else -> null
@@ -50,4 +75,16 @@ class Interpreter {
             a == null -> false
             else -> a == b
         }
+
+    // checkNumberOperands is a helper function that checks if all operands are numbers.
+    // If any operand is not a number, it throws a RuntimeError.
+    // This is useful because it allows us to catch errors early in the program.
+    private fun checkNumberOperands(operator: Token, vararg operands: Any?) {
+        operands
+            .filterNot { it is Double }
+            .ifEmpty {
+                return
+            }
+        throw RuntimeError(operator, "Operand must be a number.")
+    }
 }
