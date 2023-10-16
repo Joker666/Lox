@@ -12,6 +12,8 @@ object Lox {
     private var hadError: Boolean = false
     private var hadRuntimeError = false
 
+    private val interpreter = Interpreter()
+
     @Throws(IOException::class)
     fun runPrompt() {
         val input = InputStreamReader(System.`in`)
@@ -30,7 +32,8 @@ object Lox {
         run(String(bytes, Charset.defaultCharset()))
 
         // Indicate an error in the exit code.
-        if (hadError) exitProcess(65)
+        if (hadError) exitProcess(ExitCodes.DATAERR.value)
+        if (hadRuntimeError) exitProcess(ExitCodes.SOFTWARE.value)
     }
 
     fun run(source: String) {
@@ -42,8 +45,8 @@ object Lox {
 
         // Stop if there was a syntax error.
         if (hadError) return
-
         expression?.let { PrettyAST.print(it) }
+        interpreter.interpret(expression)
     }
 
     fun error(line: Int, message: String) {
