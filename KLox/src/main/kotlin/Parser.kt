@@ -5,12 +5,28 @@ internal class Parser(private val tokens: List<Token>) {
 
     private var index = 0
 
-    fun parse(): Expr? {
-        return try {
-            expression()
-        } catch (error: ParseError) {
-            null
+    fun parse(): List<Statement?> {
+        val statements = mutableListOf<Statement?>()
+        while (!isAtEnd()) {
+            statements.add(statement())
         }
+        return statements
+    }
+
+    private fun statement(): Statement {
+        return if (match(PRINT)) printStatement() else expressionStatement()
+    }
+
+    private fun printStatement(): Statement {
+        val value = expression()
+        consume(SEMICOLON, "Expect ';' after value.")
+        return Statement.Print(value)
+    }
+
+    private fun expressionStatement(): Statement {
+        val expr = expression()
+        consume(SEMICOLON, "Expect ';' after expression.")
+        return Statement.Expression(expr)
     }
 
     private fun expression(): Expr {
