@@ -1,10 +1,9 @@
 import kotlin.math.floor
 
 class Interpreter {
-    fun interpret(expression: Expr?) {
+    fun interpret(statements: List<Statement?>) {
         try {
-            val value = evaluate(expression!!)
-            println(stringify(value))
+            execute(statements)
         } catch (error: RuntimeError) {
             Lox.runtimeError(error)
         }
@@ -19,6 +18,16 @@ class Interpreter {
                 } else obj.toString()
             else -> obj.toString()
         }
+
+    private fun execute(statements: List<Statement?>) {
+        statements.forEach {
+            when (it) {
+                is Statement.Print -> println(stringify(evaluate(it.expression)))
+                is Statement.Expression -> evaluate(it.expression)
+                else -> {}
+            }
+        }
+    }
 
     private fun evaluate(expr: Expr): Any? =
         when (expr) {
