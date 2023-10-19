@@ -1,7 +1,7 @@
 import kotlin.math.floor
 
 class Interpreter {
-    fun interpret(statements: List<Statement?>) {
+    fun interpret(statements: List<Stmt?>) {
         try {
             execute(statements)
         } catch (error: RuntimeError) {
@@ -19,11 +19,11 @@ class Interpreter {
             else -> obj.toString()
         }
 
-    private fun execute(statements: List<Statement?>) {
+    private fun execute(statements: List<Stmt?>) {
         statements.forEach {
             when (it) {
-                is Statement.Print -> println(stringify(evaluate(it.expression)))
-                is Statement.Expression -> evaluate(it.expression)
+                is Stmt.Print -> println(stringify(evaluate(it.expression)))
+                is Stmt.Expression -> evaluate(it.expression)
                 else -> {}
             }
         }
