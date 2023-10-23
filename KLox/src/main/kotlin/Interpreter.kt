@@ -1,6 +1,8 @@
 import kotlin.math.floor
 
 class Interpreter {
+    private val environment = Environment()
+
     fun interpret(statements: List<Stmt?>) {
         try {
             execute(statements)
@@ -24,6 +26,7 @@ class Interpreter {
             when (it) {
                 is Stmt.Print -> println(stringify(evaluate(it.expression)))
                 is Stmt.Expression -> evaluate(it.expression)
+                is Stmt.Var -> environment.define(it.name.lexeme, evaluate(it.initializer))
                 else -> {}
             }
         }
@@ -41,6 +44,7 @@ class Interpreter {
                     else -> null
                 }
             }
+            is Expr.Variable -> environment.get(expr.name)
             is Expr.Binary -> {
                 val left = evaluate(expr.left)
                 val right = evaluate(expr.right)
