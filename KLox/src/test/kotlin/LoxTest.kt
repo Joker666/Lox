@@ -5,8 +5,8 @@ class LoxTest {
     fun run() {
         Lox.run("""
 var a = 1;
-var b = 2;
-print a + b;
-    """)
+a = 2;
+print a;
+""")
     }
 }

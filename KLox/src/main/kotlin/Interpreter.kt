@@ -45,6 +45,11 @@ class Interpreter {
                 }
             }
             is Expr.Variable -> environment.get(expr.name)
+            is Expr.Assign -> {
+                val value = evaluate(expr.value)
+                environment.assign(expr.name, value)
+                value
+            }
             is Expr.Binary -> {
                 val left = evaluate(expr.left)
                 val right = evaluate(expr.right)
