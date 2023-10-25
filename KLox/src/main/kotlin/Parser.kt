@@ -5,8 +5,8 @@ internal class Parser(private val tokens: List<Token>) {
 
     private var index = 0
 
-    fun parse(): List<Stmt?> {
-        val statements = mutableListOf<Stmt?>()
+    fun parse(): List<Stmt> {
+        val statements = mutableListOf<Stmt>()
         while (!isAtEnd()) {
             statements.add(declaration())
         }
@@ -15,24 +15,24 @@ internal class Parser(private val tokens: List<Token>) {
 
     // declaration   → varDecl
     //               | statement ;
-    private fun declaration(): Stmt? {
+    private fun declaration(): Stmt {
         return try {
             if (match(VAR)) varDeclaration() else statement()
         } catch (error: ParseError) {
             synchronize()
-            null
+            Stmt.Empty
         }
     }
 
     // varDecl       → "var" IDENTIFIER ( "=" expression )? ";" ;
     private fun varDeclaration(): Stmt {
         val name = consume(IDENTIFIER, "Expect variable name.")
-        var initializer: Expr? = null
+        var initializer: Expr = Expr.Empty
         if (match(EQUAL)) {
             initializer = expression()
         }
         consume(SEMICOLON, "Expect ';' after variable declaration.")
-        return Stmt.Var(name, initializer!!)
+        return Stmt.Var(name, initializer)
     }
 
     // statement     → exprStmt
@@ -48,7 +48,7 @@ internal class Parser(private val tokens: List<Token>) {
     private fun block(): List<Stmt> {
         val statements: MutableList<Stmt> = ArrayList()
         while (!check(RIGHT_BRACE) && !isAtEnd()) {
-            declaration()?.let { statements.add(it) }
+            declaration().let { statements.add(it) }
         }
         consume(RIGHT_BRACE, "Expect '}' after block.")
         return statements

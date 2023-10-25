@@ -10,4 +10,6 @@ abstract class Expr {
     internal class Variable(val name: Token) : Expr()
 
     internal class Assign(val name: Token, val value: Expr) : Expr()
+
+    object Empty : Expr()
 }

@@ -3,28 +3,10 @@ import org.junit.jupiter.api.Test
 class LoxTest {
     @Test
     fun run() {
-        Lox.run(
-            """
-var a = "global a";
-var b = "global b";
-var c = "global c";
-{
-  var a = "outer a";
-  var b = "outer b";
-  {
-    var a = "inner a";
-    print a;
-    print b;
-    print c;
-  }
-  print a;
-  print b;
-  print c;
-}
-print a;
-print b;
-print c;
-"""
-        )
+        Lox.run("""
+var b;
+
+print b; // Error!
+""")
     }
 }

@@ -6,4 +6,6 @@ abstract class Stmt {
     class Var(val name: Token, val initializer: Expr) : Stmt()
 
     class Block(val statements: List<Stmt>) : Stmt()
+
+    object Empty : Stmt()
 }
