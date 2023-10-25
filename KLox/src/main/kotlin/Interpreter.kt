@@ -35,6 +35,8 @@ class Interpreter {
 
     // executeBlock executes a list of statements within a new environment.
     // It executes the statements by recursively calling the execute function.
+    // The previous environment is restored after the statements are executed.
+    // This maintains the lexical scoping of variables. Brilliant solution.
     private fun executeBlock(statements: List<Stmt?>, environment: Environment?) {
         val previous = this.environment
         try {
