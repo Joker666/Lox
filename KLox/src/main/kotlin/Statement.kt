@@ -4,4 +4,6 @@ abstract class Stmt {
     class Print(val expression: Expr) : Stmt()
 
     class Var(val name: Token, val initializer: Expr) : Stmt()
+
+    class Block(val statements: List<Stmt>) : Stmt()
 }

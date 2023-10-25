@@ -36,9 +36,22 @@ internal class Parser(private val tokens: List<Token>) {
     }
 
     // statement     → exprStmt
-    //               | printStmt ;
+    //               | printStmt
+    //               | block ;
     private fun statement(): Stmt {
-        return if (match(PRINT)) printStatement() else expressionStatement()
+        if (match(PRINT)) return printStatement()
+        if (match(LEFT_BRACE)) return Stmt.Block(block())
+        return expressionStatement()
+    }
+
+    // block         → "{" declaration* "}" ;
+    private fun block(): List<Stmt> {
+        val statements: MutableList<Stmt> = ArrayList()
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            declaration()?.let { statements.add(it) }
+        }
+        consume(RIGHT_BRACE, "Expect '}' after block.")
+        return statements
     }
 
     // printStmt     → "print" expression ";" ;
