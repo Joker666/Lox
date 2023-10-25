@@ -1,7 +1,7 @@
 import kotlin.math.floor
 
 class Interpreter {
-    private val environment = Environment()
+    private var environment = Environment(null)
 
     fun interpret(statements: List<Stmt?>) {
         try {
@@ -27,8 +27,21 @@ class Interpreter {
                 is Stmt.Print -> println(stringify(evaluate(it.expression)))
                 is Stmt.Expression -> evaluate(it.expression)
                 is Stmt.Var -> environment.define(it.name.lexeme, evaluate(it.initializer))
+                is Stmt.Block -> executeBlock(it.statements, Environment(enclosing = environment))
                 else -> {}
             }
+        }
+    }
+
+    // executeBlock executes a list of statements within a new environment.
+    // It executes the statements by recursively calling the execute function.
+    private fun executeBlock(statements: List<Stmt?>, environment: Environment?) {
+        val previous = this.environment
+        try {
+            this.environment = environment!!
+            execute(statements)
+        } finally {
+            this.environment = previous
         }
     }
 
