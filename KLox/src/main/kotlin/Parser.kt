@@ -48,7 +48,7 @@ internal class Parser(private val tokens: List<Token>) {
     private fun block(): List<Stmt> {
         val statements: MutableList<Stmt> = ArrayList()
         while (!check(RIGHT_BRACE) && !isAtEnd()) {
-            declaration().let { statements.add(it) }
+            statements.add(declaration())
         }
         consume(RIGHT_BRACE, "Expect '}' after block.")
         return statements

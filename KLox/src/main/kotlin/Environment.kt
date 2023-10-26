@@ -8,7 +8,7 @@ class Environment(private val enclosing: Environment?) {
     fun get(name: Token): Any? {
         return when {
             contains(name.lexeme) -> values[name.lexeme]
-            enclosing != null -> enclosing.get(name)
+            enclosing != null -> enclosing.get(name) // clever
             else -> throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.")
         }
     }
@@ -16,7 +16,7 @@ class Environment(private val enclosing: Environment?) {
     fun assign(name: Token, value: Any?): Unit =
         when {
             contains(name.lexeme) -> define(name.lexeme, value)
-            enclosing != null -> enclosing.assign(name, value)
+            enclosing != null -> enclosing.assign(name, value) // clever
             else -> throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.")
         }
 
