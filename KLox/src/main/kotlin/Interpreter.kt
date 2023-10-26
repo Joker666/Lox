@@ -47,8 +47,8 @@ class Interpreter {
         }
     }
 
-    private fun evaluate(expr: Expr): Any? =
-        when (expr) {
+    private fun evaluate(expr: Expr): Any? {
+        return when (expr) {
             is Expr.Literal -> expr.value
             is Expr.Grouping -> evaluate(expr.expression)
             is Expr.Unary -> {
@@ -114,6 +114,7 @@ class Interpreter {
             }
             else -> null
         }
+    }
 
     // Lox follows Ruby’s simple rule: false and nil are falsey, and everything else is truthy.
     private fun Any?.isTruthy(): Boolean =
