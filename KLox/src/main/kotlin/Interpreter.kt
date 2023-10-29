@@ -27,6 +27,15 @@ class Interpreter {
                 is Stmt.Print -> println(stringify(evaluate(it.expression)))
                 is Stmt.Expression -> evaluate(it.expression)
                 is Stmt.Var -> environment.define(it.name.lexeme, evaluate(it.initializer))
+                is Stmt.If -> {
+                    execute(
+                        listOf(
+                            if (evaluate(it.condition).isTruthy()) {
+                                it.thenBranch
+                            } else it.elseBranch ?: Stmt.Empty
+                        )
+                    )
+                }
                 is Stmt.Block -> executeBlock(it.statements, Environment(enclosing = environment))
                 else -> {}
             }

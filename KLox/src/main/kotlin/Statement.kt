@@ -7,5 +7,7 @@ abstract class Stmt {
 
     class Block(val statements: List<Stmt>) : Stmt()
 
+    class If(val condition: Expr, val thenBranch: Stmt, val elseBranch: Stmt?) : Stmt()
+
     object Empty : Stmt()
 }
