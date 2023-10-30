@@ -27,19 +27,25 @@ class Interpreter {
                 is Stmt.Print -> println(stringify(evaluate(it.expression)))
                 is Stmt.Expression -> evaluate(it.expression)
                 is Stmt.Var -> environment.define(it.name.lexeme, evaluate(it.initializer))
-                is Stmt.If -> {
-                    execute(
-                        listOf(
-                            if (evaluate(it.condition).isTruthy()) {
-                                it.thenBranch
-                            } else it.elseBranch ?: Stmt.Empty
-                        )
-                    )
-                }
+                is Stmt.If -> executeIf(it)
                 is Stmt.Block -> executeBlock(it.statements, Environment(enclosing = environment))
                 else -> {}
             }
         }
+    }
+
+    // executeIf executes an if statement.
+    // It evaluates the condition and executes the thenBranch if the condition is truthy.
+    // If the elseBranch is present, it is executed if the condition is falsy.
+    // If the elseBranch is not present, it returns an empty statement.
+    private fun executeIf(statement: Stmt.If) {
+        val statements =
+            listOf(
+                if (evaluate(statement.condition).isTruthy()) {
+                    statement.thenBranch
+                } else statement.elseBranch ?: Stmt.Empty
+            )
+        execute(statements)
     }
 
     // executeBlock executes a list of statements within a new environment.
