@@ -80,6 +80,15 @@ class Interpreter {
                 environment.assign(expr.name, value)
                 value
             }
+            is Expr.Logical -> {
+                val left = evaluate(expr.left)
+                if (expr.operator.type == TokenType.OR) {
+                    if (left.isTruthy()) return left
+                } else { // AND operator
+                    if (!left.isTruthy()) return left
+                }
+                return evaluate(expr.right) // recursion
+            }
             is Expr.Binary -> {
                 val left = evaluate(expr.left)
                 val right = evaluate(expr.right)
