@@ -5,6 +5,8 @@ abstract class Expr {
 
     internal class Literal(val value: Any?) : Expr()
 
+    internal class Logical(val left: Expr, val operator: Token, val right: Expr) : Expr()
+
     internal class Unary(val operator: Token, val right: Expr) : Expr()
 
     internal class Variable(val name: Token) : Expr()
