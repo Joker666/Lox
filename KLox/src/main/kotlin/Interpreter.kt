@@ -28,6 +28,7 @@ class Interpreter {
                 is Stmt.Expression -> evaluate(it.expression)
                 is Stmt.Var -> environment.define(it.name.lexeme, evaluate(it.initializer))
                 is Stmt.If -> executeIf(it)
+                is Stmt.While -> executeWhile(it)
                 is Stmt.Block -> executeBlock(it.statements, Environment(enclosing = environment))
                 else -> {}
             }
@@ -46,6 +47,15 @@ class Interpreter {
                 } else statement.elseBranch ?: Stmt.Empty
             )
         execute(statements) // recursion
+    }
+
+    // executeWhile executes a while statement.
+    // It evaluates the condition and executes the body if the condition is truthy.
+    // It repeats the process until the condition is falsy.
+    private fun executeWhile(statement: Stmt.While) {
+        while (evaluate(statement.condition).isTruthy()) {
+            execute(listOf(statement.body))
+        }
     }
 
     // executeBlock executes a list of statements within a new environment.

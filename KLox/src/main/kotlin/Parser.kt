@@ -38,9 +38,11 @@ internal class Parser(private val tokens: List<Token>) {
     // statement     → exprStmt
     //               | ifStmt
     //               | printStmt
+    //               | whileStmt
     //               | block ;
     private fun statement(): Stmt {
         if (match(IF)) return ifStatement()
+        if (match(WHILE)) return whileStatement()
         if (match(PRINT)) return printStatement()
         if (match(LEFT_BRACE)) return Stmt.Block(block())
         return expressionStatement()
@@ -58,6 +60,15 @@ internal class Parser(private val tokens: List<Token>) {
             elseBranch = statement()
         }
         return Stmt.If(condition, thenBranch, elseBranch)
+    }
+
+    // whileStmt     → "while" "(" expression ")" statement ;
+    private fun whileStatement(): Stmt {
+        consume(LEFT_PAREN, "Expect '(' after 'while'.")
+        val condition = expression()
+        consume(RIGHT_PAREN, "Expect ')' after condition.")
+        val body = statement()
+        return Stmt.While(condition, body)
     }
 
     // block         → "{" declaration* "}" ;
