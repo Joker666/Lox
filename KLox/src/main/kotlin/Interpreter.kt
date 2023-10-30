@@ -45,7 +45,7 @@ class Interpreter {
                     statement.thenBranch
                 } else statement.elseBranch ?: Stmt.Empty
             )
-        execute(statements)
+        execute(statements) // recursion
     }
 
     // executeBlock executes a list of statements within a new environment.
@@ -56,7 +56,7 @@ class Interpreter {
         val previous = this.environment
         try {
             this.environment = environment!!
-            execute(statements)
+            execute(statements) // recursion
         } finally {
             this.environment = previous
         }
