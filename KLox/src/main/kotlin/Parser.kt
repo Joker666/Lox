@@ -43,6 +43,7 @@ internal class Parser(private val tokens: List<Token>) {
     private fun statement(): Stmt {
         if (match(IF)) return ifStatement()
         if (match(WHILE)) return whileStatement()
+        if (match(FOR)) return forStatement()
         if (match(PRINT)) return printStatement()
         if (match(LEFT_BRACE)) return Stmt.Block(block())
         return expressionStatement()
@@ -69,6 +70,46 @@ internal class Parser(private val tokens: List<Token>) {
         consume(RIGHT_PAREN, "Expect ')' after condition.")
         val body = statement()
         return Stmt.While(condition, body)
+    }
+
+    // forStmt       → "for" "(" ( varDecl | exprStmt | ";" )
+    //                 expression? ";"
+    //                 expression? ")" statement ;
+    private fun forStatement(): Stmt {
+        consume(LEFT_PAREN, "Expect '(' after 'for'.")
+        val initializer: Stmt? =
+            if (match(SEMICOLON)) {
+                null
+            } else if (match(VAR)) {
+                varDeclaration()
+            } else {
+                expressionStatement()
+            }
+
+        var condition: Expr = Expr.Literal(true)
+        if (!check(SEMICOLON)) {
+            condition = expression()
+        }
+        consume(SEMICOLON, "Expect ';' after loop condition.")
+
+        var increment: Expr? = null
+        if (!check(RIGHT_PAREN)) {
+            increment = expression()
+        }
+        consume(RIGHT_PAREN, "Expect ')' after for clauses.")
+
+        var body = statement()
+
+        // initializer -> condition -> statement -> increment
+        if (increment != null) {
+            body = Stmt.Block(listOf(body, Stmt.Expression(increment)))
+        }
+        body = Stmt.While(condition, body)
+        if (initializer != null) {
+            body = Stmt.Block(listOf(initializer, body))
+        }
+
+        return body
     }
 
     // block         → "{" declaration* "}" ;
