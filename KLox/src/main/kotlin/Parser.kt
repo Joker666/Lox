@@ -86,7 +86,7 @@ internal class Parser(private val tokens: List<Token>) {
                 expressionStatement()
             }
 
-        var condition: Expr = Expr.Literal(true)
+        var condition: Expr = Expr.Literal(true) // infinite like the while loop
         if (!check(SEMICOLON)) {
             condition = expression()
         }
