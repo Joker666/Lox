@@ -3,10 +3,17 @@ import org.junit.jupiter.api.Test
 class LoxTest {
     @Test
     fun run() {
-        Lox.run("""
-var b;
+        Lox.run(
+            """
+var a = 0;
+var temp;
 
-print b; // Error!
-""")
+for (var b = 1; a < 10000; b = temp + b) {
+    print a;
+    temp = a;
+    a = b;
+}
+"""
+        )
     }
 }
