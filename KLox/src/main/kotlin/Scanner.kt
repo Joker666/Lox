@@ -4,7 +4,6 @@ import ScannerConstants.NUL
 import TokenType.*
 import java.lang.Character.isDigit
 
-
 class Scanner(private val source: String) {
     private val tokens = mutableListOf<Token>()
     private var start = 0
@@ -42,15 +41,18 @@ class Scanner(private val source: String) {
             '=' -> addToken(if (match('=')) EQUAL_EQUAL else EQUAL)
             '<' -> addToken(if (match('=')) LESS_EQUAL else LESS)
             '>' -> addToken(if (match('=')) GREATER_EQUAL else GREATER)
-            ' ', '\r', '\t' -> {} // ignored whitespace
+            ' ',
+            '\r',
+            '\t' -> {} // ignored whitespace
             '\n' -> line++
             '/' -> processSlash()
             '"' -> processStringLiteral()
-            else -> when {
-                isDigit(c) -> processNumber()
-                isAlpha(c) -> processIdentifier()
-                else -> Lox.error(line, "Unexpected character.")
-            }
+            else ->
+                when {
+                    isDigit(c) -> processNumber()
+                    isAlpha(c) -> processIdentifier()
+                    else -> Lox.error(line, "Unexpected character.")
+                }
         }
     }
 
@@ -152,7 +154,8 @@ class Scanner(private val source: String) {
     }
 
     // processIdentifier processes an identifier.
-    // An identifier starts with a letter or underscore and can contain any number of letters, digits, or underscores.
+    // An identifier starts with a letter or underscore and can contain any number of letters,
+    // digits, or underscores.
     // It is converted to a keyword if it is a reserved word.
     private fun processIdentifier() {
         while (isAlphaNumeric(current())) advance()
@@ -166,22 +169,25 @@ class Scanner(private val source: String) {
 object ScannerConstants {
     const val NUL = '\u0000' // Weirdly Kotlin doesn't support '\0' as a char o.O
     val ALPHAS = ('a'..'z').union('A'..'Z').plus('_')
-    val KEYWORDS = mapOf(
-        "and" to AND,
-        "class" to CLASS,
-        "else" to ELSE,
-        "false" to FALSE,
-        "for" to FOR,
-        "fun" to FUN,
-        "if" to IF,
-        "nil" to NIL,
-        "or" to OR,
-        "print" to PRINT,
-        "return" to RETURN,
-        "super" to SUPER,
-        "this" to THIS,
-        "true" to TRUE,
-        "var" to VAR,
-        "while" to WHILE
-    )
+    val KEYWORDS =
+        mapOf(
+            "and" to AND,
+            "class" to CLASS,
+            "else" to ELSE,
+            "false" to FALSE,
+            "for" to FOR,
+            "fun" to FUN,
+            "if" to IF,
+            "nil" to NIL,
+            "or" to OR,
+            "print" to PRINT,
+            "return" to RETURN,
+            "super" to SUPER,
+            "this" to THIS,
+            "true" to TRUE,
+            "var" to VAR,
+            "while" to WHILE,
+            "break" to BREAK,
+            "continue" to CONTINUE
+        )
 }
