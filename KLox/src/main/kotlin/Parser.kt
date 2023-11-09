@@ -47,6 +47,7 @@ internal class Parser(private val tokens: List<Token>) {
         if (match(FOR)) return forStatement()
         if (match(PRINT)) return printStatement()
         if (match(BREAK)) return breakStatement()
+        if (match(CONTINUE)) return continueStatement()
         if (match(LEFT_BRACE)) return Stmt.Block(block())
         return expressionStatement()
     }
@@ -153,6 +154,15 @@ internal class Parser(private val tokens: List<Token>) {
         }
         consume(SEMICOLON, "Expect ';' after break.")
         return Stmt.Break()
+    }
+
+    // continueStmt  → "continue" ";" ;
+    private fun continueStatement(): Stmt {
+        if (loopDepth == 0) {
+            error(previous(), "Cannot continue outside of loop.")
+        }
+        consume(SEMICOLON, "Expect ';' after continue.")
+        return Stmt.Continue()
     }
 
     // exprStmt      → expression ";" ;

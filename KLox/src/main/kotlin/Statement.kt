@@ -9,6 +9,8 @@ abstract class Stmt {
 
     class Break : Stmt()
 
+    class Continue : Stmt()
+
     class If(val condition: Expr, val thenBranch: Stmt, val elseBranch: Stmt?) : Stmt()
 
     class While(val condition: Expr, val body: Stmt) : Stmt()
