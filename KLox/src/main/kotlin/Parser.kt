@@ -48,7 +48,7 @@ internal class Parser(private val tokens: List<Token>) {
         if (match(PRINT)) return printStatement()
         if (match(BREAK)) return breakStatement()
         if (match(CONTINUE)) return continueStatement()
-        if (match(LEFT_BRACE)) return Stmt.Block(block())
+        if (match(LEFT_BRACE)) return Stmt.Block(block()) // <- entry to a new block { ... }
         return expressionStatement()
     }
 
