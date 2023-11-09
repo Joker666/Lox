@@ -28,6 +28,7 @@ class Interpreter {
                 is Stmt.Expression -> evaluate(it.expression)
                 is Stmt.Var -> environment.define(it.name.lexeme, evaluate(it.initializer))
                 is Stmt.If -> executeIf(it)
+                is Stmt.Break -> throw BreakException()
                 is Stmt.While -> executeWhile(it)
                 is Stmt.Block -> executeBlock(it.statements, Environment(enclosing = environment))
                 else -> {}
@@ -53,8 +54,12 @@ class Interpreter {
     // It evaluates the condition and executes the body if the condition is truthy.
     // It repeats the process until the condition is falsy.
     private fun executeWhile(statement: Stmt.While) {
-        while (evaluate(statement.condition).isTruthy()) {
-            execute(listOf(statement.body))
+        try {
+            while (evaluate(statement.condition).isTruthy()) {
+                execute(listOf(statement.body))
+            }
+        } catch (e: BreakException) {
+            // do nothing
         }
     }
 

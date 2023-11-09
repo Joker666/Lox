@@ -23,3 +23,5 @@ enum class ExitCodes(val value: Int) {
      */
     SOFTWARE(70)
 }
+
+class BreakException : RuntimeException()
