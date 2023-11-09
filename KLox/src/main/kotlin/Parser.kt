@@ -4,6 +4,7 @@ internal class Parser(private val tokens: List<Token>) {
     private class ParseError : RuntimeException()
 
     private var index = 0
+    private var loopDepth = 0
 
     fun parse(): List<Stmt> {
         val statements = mutableListOf<Stmt>()
@@ -45,6 +46,7 @@ internal class Parser(private val tokens: List<Token>) {
         if (match(WHILE)) return whileStatement()
         if (match(FOR)) return forStatement()
         if (match(PRINT)) return printStatement()
+        if (match(BREAK)) return breakStatement()
         if (match(LEFT_BRACE)) return Stmt.Block(block())
         return expressionStatement()
     }
@@ -68,8 +70,15 @@ internal class Parser(private val tokens: List<Token>) {
         consume(LEFT_PAREN, "Expect '(' after 'while'.")
         val condition = expression()
         consume(RIGHT_PAREN, "Expect ')' after condition.")
-        val body = statement()
-        return Stmt.While(condition, body)
+
+        try {
+            loopDepth += 1
+
+            val body = statement()
+            return Stmt.While(condition, body)
+        } finally {
+            loopDepth -= 1
+        }
     }
 
     // forStmt       → "for" "(" ( varDecl | exprStmt | ";" )
@@ -98,18 +107,26 @@ internal class Parser(private val tokens: List<Token>) {
         }
         consume(RIGHT_PAREN, "Expect ')' after for clauses.")
 
-        var body = statement()
+        // ------------------------------------------------------------
 
-        // initializer -> condition -> statement -> increment
-        if (increment != null) {
-            body = Stmt.Block(listOf(body, Stmt.Expression(increment)))
-        }
-        body = Stmt.While(condition, body)
-        if (initializer != null) {
-            body = Stmt.Block(listOf(initializer, body))
-        }
+        try {
+            loopDepth += 1
 
-        return body
+            var body = statement()
+
+            // initializer -> condition -> statement -> increment
+            if (increment != null) {
+                body = Stmt.Block(listOf(body, Stmt.Expression(increment)))
+            }
+            body = Stmt.While(condition, body)
+            if (initializer != null) {
+                body = Stmt.Block(listOf(initializer, body))
+            }
+
+            return body
+        } finally {
+            loopDepth -= 1
+        }
     }
 
     // block         → "{" declaration* "}" ;
@@ -127,6 +144,15 @@ internal class Parser(private val tokens: List<Token>) {
         val value = expression()
         consume(SEMICOLON, "Expect ';' after value.")
         return Stmt.Print(value)
+    }
+
+    // breakStmt     → "break" ";" ;
+    private fun breakStatement(): Stmt {
+        if (loopDepth == 0) {
+            error(previous(), "Cannot break outside of loop.")
+        }
+        consume(SEMICOLON, "Expect ';' after break.")
+        return Stmt.Break()
     }
 
     // exprStmt      → expression ";" ;

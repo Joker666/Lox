@@ -21,6 +21,8 @@ forStmt        → "for" "(" ( varDecl | exprStmt | ";" )
                  expression? ";"
                  expression? ")" statement ;
 
+breakStmt      → "break" ";" ;
+
 block          → "{" declaration* "}" ;
 
 exprStmt       → expression ";" ;
