@@ -10,6 +10,8 @@ statement      → exprStmt
                | ifStmt
                | printStmt
                | whileStmt
+               | breakStmt
+               | continueStmt
                | block ;
 
 ifStmt         → "if" "(" expression ")" statement

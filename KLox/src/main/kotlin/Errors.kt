@@ -25,3 +25,5 @@ enum class ExitCodes(val value: Int) {
 }
 
 class BreakException : RuntimeException()
+
+class ContinueException : RuntimeException()
