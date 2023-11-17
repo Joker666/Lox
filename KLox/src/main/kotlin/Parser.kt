@@ -76,7 +76,7 @@ internal class Parser(private val tokens: List<Token>) {
             loopDepth += 1
 
             val body = statement()
-            return Stmt.While(condition, body)
+            return Stmt.While(condition, body, null)
         } finally {
             loopDepth -= 1
         }
@@ -115,11 +115,8 @@ internal class Parser(private val tokens: List<Token>) {
 
             var body = statement()
 
-            // initializer -> condition -> statement -> increment
-            if (increment != null) {
-                body = Stmt.Block(listOf(body, Stmt.Expression(increment)))
-            }
-            body = Stmt.While(condition, body)
+            // initializer -> condition -> body -> increment
+            body = Stmt.While(condition, body, increment)
             if (initializer != null) {
                 body = Stmt.Block(listOf(initializer, body))
             }

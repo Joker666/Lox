@@ -61,6 +61,8 @@ class Interpreter {
                     execute(listOf(statement.body))
                 } catch (e: ContinueException) {
                     // do nothing
+                } finally {
+                    statement.increment?.let { evaluate(it) }
                 }
             }
         } catch (e: BreakException) {
