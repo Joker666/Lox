@@ -263,7 +263,34 @@ internal class Parser(private val tokens: List<Token>) {
             val right = unary()
             return Expr.Unary(operator, right)
         }
-        return primary()
+        return call()
+    }
+
+    // call          → primary ( "(" arguments? ")" )* ;
+    private fun call(): Expr {
+        var expr: Expr = primary()
+        while (true) {
+            if (match(LEFT_PAREN)) {
+                expr = finishCall(expr)
+            } else {
+                break
+            }
+        }
+        return expr
+    }
+
+    private fun finishCall(callee: Expr): Expr {
+        val arguments: MutableList<Expr> = ArrayList()
+        if (!check(RIGHT_PAREN)) {
+            do {
+                if (arguments.size >= 255) {
+                    error(current(), "Cannot have more than 255 arguments.")
+                }
+                arguments.add(expression())
+            } while (match(COMMA))
+        }
+        val paren = consume(RIGHT_PAREN, "Expect ')' after arguments.")
+        return Expr.Call(callee, paren, arguments)
     }
 
     // primary       → "true" | "false" | "nil"
@@ -361,6 +388,9 @@ internal class Parser(private val tokens: List<Token>) {
     private fun previous(): Token {
         return tokens[index - 1]
     }
+
+    // return the token at the given index
+    private fun peek(lookAhead: Int = 0) = tokens[index + lookAhead]
 
     private fun error(token: Token, message: String): ParseError {
         Lox.error(token, message)
