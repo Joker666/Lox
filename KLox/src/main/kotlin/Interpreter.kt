@@ -54,6 +54,7 @@ class Interpreter {
     // executeWhile executes a while statement.
     // It evaluates the condition and executes the body if the condition is truthy.
     // It repeats the process until the condition is falsy.
+    // It handles break and continue statements with clever solution.
     private fun executeWhile(statement: Stmt.While) {
         try {
             while (evaluate(statement.condition).isTruthy()) {
@@ -94,6 +95,21 @@ class Interpreter {
                     TokenType.MINUS -> -(right as Double)
                     TokenType.BANG -> !right.isTruthy()
                     else -> null
+                }
+            }
+            is Expr.Call -> {
+                val callee = evaluate(expr.callee)
+                val arguments = expr.arguments.map { evaluate(it) }
+                if (callee is LoxCallable) {
+                    if (arguments.size != callee.arity) {
+                        throw RuntimeError(
+                            expr.paren,
+                            "Expected ${callee.arity} arguments but got ${arguments.size}."
+                        )
+                    }
+                    callee.call(this, arguments)
+                } else {
+                    throw RuntimeError(expr.paren, "Can only call functions and classes.")
                 }
             }
             is Expr.Variable -> environment.get(expr.name)
