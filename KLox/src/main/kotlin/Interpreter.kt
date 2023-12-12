@@ -1,7 +1,26 @@
 import kotlin.math.floor
 
 class Interpreter {
-    private var environment = Environment(null)
+    // globals field holds a fixed reference to the outermost global environment.
+    private val globals: Environment = Environment(null)
+    private var environment = globals
+
+    init {
+        globals.define(
+            "clock",
+            object : LoxCallable {
+                override fun arity(): Int = 0
+
+                override fun call(interpreter: Interpreter, args: List<Any?>): Double {
+                    return System.currentTimeMillis() / 1000.0
+                }
+
+                override fun toString(): String {
+                    return "<native fn>"
+                }
+            }
+        )
+    }
 
     fun interpret(statements: List<Stmt>) {
         try {
