@@ -5,6 +5,8 @@ abstract class Stmt {
 
     class Var(val name: Token, val initializer: Expr) : Stmt()
 
+    class Function(val name: Token, val params: List<Token>, val body: List<Stmt>) : Stmt()
+
     class Block(val statements: List<Stmt>) : Stmt()
 
     class Break : Stmt()

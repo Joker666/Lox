@@ -1,5 +1,11 @@
 import TokenType.*
 
+enum class FunctionKind {
+    FUNCTION,
+    METHOD,
+    INITIALIZER,
+}
+
 internal class Parser(private val tokens: List<Token>) {
     private class ParseError : RuntimeException()
 
@@ -14,15 +20,38 @@ internal class Parser(private val tokens: List<Token>) {
         return statements
     }
 
-    // declaration   → varDecl
+    // declaration   → funDecl
+    //               | varDecl
     //               | statement ;
     private fun declaration(): Stmt {
         return try {
-            if (match(VAR)) varDeclaration() else statement()
+            if (match(FUN)) return funDeclaration(FunctionKind.FUNCTION)
+            if (match(VAR)) return varDeclaration()
+
+            return statement()
         } catch (error: ParseError) {
             synchronize()
             Stmt.Empty
         }
+    }
+
+    // funDecl       → "fun" function ;
+    private fun funDeclaration(kind: FunctionKind): Stmt {
+        val name = consume(IDENTIFIER, "Expect $kind name.")
+        consume(LEFT_PAREN, "Expect '(' after function name.")
+        val parameters = mutableListOf<Token>()
+        if (!check(RIGHT_PAREN)) {
+            do {
+                if (parameters.size >= 255) {
+                    error(peek(), "Can't have more than 255 parameters.")
+                }
+                parameters.add(consume(IDENTIFIER, "Expect parameter name."))
+            } while (match(COMMA))
+        }
+        consume(RIGHT_PAREN, "Expect ')' after parameters.")
+        consume(LEFT_BRACE, "Expect '{' before function body.")
+        val body = block()
+        return Stmt.Function(name, parameters, body)
     }
 
     // varDecl       → "var" IDENTIFIER ( "=" expression )? ";" ;
