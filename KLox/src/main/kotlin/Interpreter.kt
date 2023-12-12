@@ -120,10 +120,10 @@ class Interpreter {
                 val callee = evaluate(expr.callee)
                 val arguments = expr.arguments.map { evaluate(it) }
                 if (callee is LoxCallable) {
-                    if (arguments.size != callee.arity) {
+                    if (arguments.size != callee.arity()) {
                         throw RuntimeError(
                             expr.paren,
-                            "Expected ${callee.arity} arguments but got ${arguments.size}."
+                            "Expected ${callee.arity()} arguments but got ${arguments.size}."
                         )
                     }
                     callee.call(this, arguments)
