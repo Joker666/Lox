@@ -2,7 +2,7 @@ import kotlin.math.floor
 
 class Interpreter {
     // globals field holds a fixed reference to the outermost global environment.
-    private val globals: Environment = Environment(null)
+    val globals: Environment = Environment(null)
     private var environment = globals
 
     init {
@@ -94,7 +94,7 @@ class Interpreter {
     // It executes the statements by recursively calling the execute function.
     // The previous environment is restored after the statements are executed.
     // This maintains the lexical scoping of variables. Clever solution.
-    private fun executeBlock(statements: List<Stmt>, environment: Environment?) {
+    fun executeBlock(statements: List<Stmt>, environment: Environment?) {
         val previous = this.environment
         try {
             this.environment = environment!!
