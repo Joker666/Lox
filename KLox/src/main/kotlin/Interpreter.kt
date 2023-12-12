@@ -45,6 +45,7 @@ class Interpreter {
             when (it) {
                 is Stmt.Print -> println(stringify(evaluate(it.expression)))
                 is Stmt.Expression -> evaluate(it.expression)
+                is Stmt.Function -> environment.define(it.name.lexeme, LoxFunction(it))
                 is Stmt.Var -> environment.define(it.name.lexeme, evaluate(it.initializer))
                 is Stmt.If -> executeIf(it)
                 is Stmt.Break -> throw BreakException()
