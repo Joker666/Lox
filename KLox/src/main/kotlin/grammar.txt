@@ -13,10 +13,13 @@ statement      → exprStmt
                | forStmt
                | ifStmt
                | printStmt
+               | returnStmt
                | whileStmt
                | breakStmt
                | continueStmt
                | block ;
+
+returnStmt     → "return" expression? ";" ;
 
 ifStmt         → "if" "(" expression ")" statement
                ( "else" statement )? ;
