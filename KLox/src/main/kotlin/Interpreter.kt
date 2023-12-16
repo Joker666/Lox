@@ -46,6 +46,7 @@ class Interpreter {
                 is Stmt.Print -> println(stringify(evaluate(it.expression)))
                 is Stmt.Expression -> evaluate(it.expression)
                 is Stmt.Function -> environment.define(it.name.lexeme, LoxFunction(it))
+                is Stmt.Return -> executeReturn(it)
                 is Stmt.Var -> environment.define(it.name.lexeme, evaluate(it.initializer))
                 is Stmt.If -> executeIf(it)
                 is Stmt.Break -> throw BreakException()
@@ -55,6 +56,11 @@ class Interpreter {
                 else -> {}
             }
         }
+    }
+
+    private fun executeReturn(stmt: Stmt.Return) {
+        val value = stmt.value?.let { evaluate(it) }
+        throw ReturnException(value)
     }
 
     // executeIf executes an if statement.
