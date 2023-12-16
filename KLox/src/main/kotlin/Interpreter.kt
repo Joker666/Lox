@@ -2,7 +2,7 @@ import kotlin.math.floor
 
 class Interpreter {
     // globals field holds a fixed reference to the outermost global environment.
-    val globals: Environment = Environment(null)
+    private val globals: Environment = Environment(null)
     private var environment = globals
 
     init {
@@ -45,7 +45,7 @@ class Interpreter {
             when (it) {
                 is Stmt.Print -> println(stringify(evaluate(it.expression)))
                 is Stmt.Expression -> evaluate(it.expression)
-                is Stmt.Function -> environment.define(it.name.lexeme, LoxFunction(it))
+                is Stmt.Function -> environment.define(it.name.lexeme, LoxFunction(it, environment))
                 is Stmt.Return -> executeReturn(it)
                 is Stmt.Var -> environment.define(it.name.lexeme, evaluate(it.initializer))
                 is Stmt.If -> executeIf(it)

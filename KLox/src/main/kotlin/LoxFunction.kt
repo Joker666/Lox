@@ -1,4 +1,7 @@
-internal class LoxFunction(private val declaration: Stmt.Function) : LoxCallable {
+internal class LoxFunction(
+    private val declaration: Stmt.Function,
+    private val closure: Environment
+) : LoxCallable {
     override fun arity(): Int {
         return declaration.params.size
     }
@@ -6,7 +9,7 @@ internal class LoxFunction(private val declaration: Stmt.Function) : LoxCallable
     // call handled function execution. It is one of the most clever solutions that makes sure
     // the function encapsulates its parameters. This means each function gets its own environment.
     override fun call(interpreter: Interpreter, args: List<Any?>): Any? {
-        val environment = Environment(interpreter.globals)
+        val environment = Environment(closure)
 
         // bind the arguments to the parameters
         for (i in declaration.params.indices) {
