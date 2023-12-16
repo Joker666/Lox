@@ -58,6 +58,8 @@ class Interpreter {
         }
     }
 
+    // executeReturn executes a return statement.
+    // It evaluates the return value and throws a ReturnException with the evaluated value.
     private fun executeReturn(stmt: Stmt.Return) {
         val value = stmt.value?.let { evaluate(it) }
         throw ReturnException(value)

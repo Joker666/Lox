@@ -13,7 +13,11 @@ internal class LoxFunction(private val declaration: Stmt.Function) : LoxCallable
             environment.define(declaration.params[i].lexeme, args[i])
         }
 
-        interpreter.executeBlock(declaration.body, environment)
+        try {
+            interpreter.executeBlock(declaration.body, environment)
+        } catch (returnValue: ReturnException) {
+            return returnValue.value
+        }
         return null
     }
 
