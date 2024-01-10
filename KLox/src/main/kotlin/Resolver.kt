@@ -1,6 +1,7 @@
 import java.util.*
 
 class Resolver(private val interpreter: Interpreter) {
+    // Each element in the stack is a Map representing a single block scope.
     private val scopes = Stack<MutableMap<String, Boolean>>()
 
     private fun resolve(statements: List<Stmt>) {
