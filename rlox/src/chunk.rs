@@ -11,8 +11,16 @@ impl Chunk {
         Chunk { code: Vec::new() }
     }
 
-    pub fn write(&mut self, byte: u8) {
+    fn write(&mut self, byte: u8) {
         self.code.push(byte);
+    }
+
+    pub fn write_opcode(&mut self, opcode: OpCode) {
+        self.write(opcode.into());
+    }
+
+    pub fn free(&mut self) {
+        self.code = Vec::new();
     }
 }
 
