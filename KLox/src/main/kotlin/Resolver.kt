@@ -43,7 +43,10 @@ class Resolver(private val interpreter: Interpreter) {
 
     private fun resolve(expr: Expr) {
         when (expr) {
-            is Expr.Assign -> resolve(expr.value)
+            is Expr.Assign -> {
+                resolve(expr.value)
+                resolveLocal(expr, expr.name)
+            }
             is Expr.Binary -> resolve(expr.left)
             is Expr.Call -> {
                 resolve(expr.callee)
