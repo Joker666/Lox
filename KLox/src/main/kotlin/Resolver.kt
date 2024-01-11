@@ -19,7 +19,7 @@ class Resolver(private val interpreter: Interpreter) {
             is Stmt.Function -> {
                 declare(stmt.name)
                 define(stmt.name)
-                resolve(stmt.body)
+                resolveFunction(stmt)
             }
             is Stmt.If -> {
                 resolveExpr(stmt.condition)
@@ -83,6 +83,16 @@ class Resolver(private val interpreter: Interpreter) {
                 return
             }
         }
+    }
+
+    private fun resolveFunction(function: Stmt.Function) {
+        beginScope()
+        for (param in function.params) {
+            declare(param)
+            define(param)
+        }
+        resolve(function.body)
+        endScope()
     }
 
     private fun beginScope() {
