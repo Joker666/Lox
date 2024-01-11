@@ -72,6 +72,10 @@ class Resolver(private val interpreter: Interpreter) {
         // looking in each map for a matching name.
         for (i in scopes.indices.reversed()) {
             if (scopes[i].containsKey(name.lexeme)) {
+                // If we find the variable, we resolve it, passing in the number of scopes between
+                // the current innermost scope and the scope where the variable was found. So, if
+                // the variable was found in the current scope, we pass in 0. If it’s in the
+                // immediately enclosing scope, 1.
                 interpreter.resolve(expr, scopes.size - 1 - i)
                 return
             }
