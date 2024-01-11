@@ -59,9 +59,22 @@ class Resolver(private val interpreter: Interpreter) {
                 val scope = scopes.peek()
                 if (scope[expr.name.lexeme] == false) {
                     Lox.error(expr.name, "Can't read local variable in its own initializer.")
+                } else {
+                    resolveLocal(expr, expr.name)
                 }
             }
             else -> {} // do nothing, we don't care about other expressions yet.
+        }
+    }
+
+    private fun resolveLocal(expr: Expr, name: Token) {
+        // We start at the innermost scope and work outwards,
+        // looking in each map for a matching name.
+        for (i in scopes.indices.reversed()) {
+            if (scopes[i].containsKey(name.lexeme)) {
+                interpreter.resolve(expr, scopes.size - 1 - i)
+                return
+            }
         }
     }
 
