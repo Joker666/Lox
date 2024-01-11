@@ -22,6 +22,30 @@ impl Chunk {
     pub fn free(&mut self) {
         self.code = Vec::new();
     }
+
+    pub fn disassemble<T: ToString>(&self, name: T) {
+        println!("== {} ==", name.to_string());
+
+        let mut offset = 0;
+        while offset < self.code.len() {
+            offset = self.disassemble_instruction(offset);
+        }
+    }
+
+    fn disassemble_instruction(&self, offset: usize) -> usize {
+        print!("{:04} ", offset);
+
+        let instruction: OpCode = self.code[offset].into();
+
+        match instruction {
+            OpCode::OpReturn => self.simple_instruction("OP_RETURN", offset),
+        }
+    }
+
+    fn simple_instruction(&self, name: &str, offset: usize) -> usize {
+        println!("[{}] {}", name, self.code[offset]);
+        offset + 1
+    }
 }
 
 impl From<u8> for OpCode {
