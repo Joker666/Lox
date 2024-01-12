@@ -17,8 +17,12 @@ class Resolver(private val interpreter: Interpreter) {
             }
             is Stmt.Expression -> resolveExpr(stmt.expression)
             is Stmt.Function -> {
+                // Unlike variables, we define the name eagerly, before resolving the function’s
+                // body.
+                // This lets a function recursively refer to itself inside its own body.
                 declare(stmt.name)
                 define(stmt.name)
+
                 resolveFunction(stmt)
             }
             is Stmt.If -> {
@@ -44,6 +48,8 @@ class Resolver(private val interpreter: Interpreter) {
     private fun resolveExpr(expr: Expr) {
         when (expr) {
             is Expr.Assign -> {
+                // First, we resolve the expression for the assigned value in case
+                // it also contains references to other variables.
                 resolveExpr(expr.value)
                 resolveLocal(expr, expr.name)
             }
