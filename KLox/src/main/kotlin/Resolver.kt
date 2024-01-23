@@ -17,12 +17,13 @@ class Resolver(private val interpreter: Interpreter) {
             }
             is Stmt.Expression -> resolveExpr(stmt.expression)
             is Stmt.Function -> {
-                // Unlike variables, we define the name eagerly, before resolving the function’s
-                // body.
+                // Unlike variables, we define the name eagerly,
+                // before resolving the function’s body.
                 // This lets a function recursively refer to itself inside its own body.
                 declare(stmt.name)
                 define(stmt.name)
 
+                // In a static analysis, we immediately traverse into the body right then and there.
                 resolveFunction(stmt)
             }
             is Stmt.If -> {
@@ -67,7 +68,10 @@ class Resolver(private val interpreter: Interpreter) {
 
                 val scope = scopes.peek()
                 if (scope[expr.name.lexeme] == false) {
-                    Lox.error(expr.name, "Can't read local variable in its own initializer.")
+                    Lox.error(
+                        expr.name,
+                        "Can't read local variable in its own initializer."
+                    ) // Clever
                 } else {
                     resolveLocal(expr, expr.name)
                 }
