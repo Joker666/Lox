@@ -7,6 +7,7 @@ pub enum OpCode {
 
 pub struct Chunk {
     code: Vec<u8>,
+    lines: Vec<usize>,
     constants: ValueArray,
 }
 
@@ -14,16 +15,18 @@ impl Chunk {
     pub fn new() -> Self {
         Chunk {
             code: Vec::new(),
+            lines: Vec::new(),
             constants: ValueArray::new(),
         }
     }
 
-    pub fn write(&mut self, byte: u8) {
+    pub fn write(&mut self, byte: u8, line: usize) {
         self.code.push(byte);
+        self.lines.push(line);
     }
 
-    pub fn write_opcode(&mut self, opcode: OpCode) {
-        self.write(opcode.into());
+    pub fn write_opcode(&mut self, opcode: OpCode, line: usize) {
+        self.write(opcode.into(), line);
     }
 
     pub fn free(&mut self) {
@@ -46,6 +49,12 @@ impl Chunk {
 
     fn disassemble_instruction(&self, offset: usize) -> usize {
         print!("{:04} ", offset);
+
+        if offset > 0 && self.lines[offset] == self.lines[offset - 1] {
+            print!("   | ");
+        } else {
+            print!("{:4} ", self.lines[offset]);
+        }
 
         let instruction: OpCode = self.code[offset].into();
 
