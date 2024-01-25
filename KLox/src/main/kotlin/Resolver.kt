@@ -100,7 +100,8 @@ class Resolver(private val interpreter: Interpreter) {
                 // the current innermost scope and the scope where the variable was found. So, if
                 // the variable was found in the current scope, we pass in 0. If it’s in the
                 // immediately enclosing scope, 1.
-                interpreter.resolve(expr, scopes.size - 1 - i)
+                val depth = scopes.size - 1 - i
+                interpreter.resolve(expr, depth)
                 return
             }
         }

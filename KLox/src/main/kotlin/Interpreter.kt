@@ -5,6 +5,8 @@ class Interpreter {
     private val globals: Environment = Environment(null)
     private var environment = globals
 
+    private val locals: HashMap<Expr, Int> = HashMap()
+
     init {
         globals.define(
             "clock",
@@ -56,6 +58,10 @@ class Interpreter {
                 else -> {}
             }
         }
+    }
+
+    fun resolve(expr: Expr, depth: Int) {
+        locals[expr] = depth
     }
 
     // executeReturn executes a return statement.
@@ -140,7 +146,7 @@ class Interpreter {
                     throw RuntimeError(expr.paren, "Can only call functions and classes.")
                 }
             }
-            is Expr.Variable -> environment.get(expr.name)
+            is Expr.Variable -> lookUpVariable(expr.name, expr)
             is Expr.Assign -> {
                 val value = evaluate(expr.value)
                 environment.assign(expr.name, value)
@@ -203,6 +209,18 @@ class Interpreter {
                 }
             }
             else -> null
+        }
+    }
+
+    // lookUpVariable looks up a variable in the environment
+    // using the depth/distance it got from the resolver pass.
+    // If the variable is not found in the environment, it looks up the variable in the globals.
+    private fun lookUpVariable(name: Token, expr: Expr): Any? {
+        val depth = locals[expr]
+        return if (depth != null) {
+            environment.getAt(depth, name)
+        } else {
+            globals.get(name)
         }
     }
 
