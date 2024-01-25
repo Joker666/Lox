@@ -149,7 +149,14 @@ class Interpreter {
             is Expr.Variable -> lookUpVariable(expr.name, expr)
             is Expr.Assign -> {
                 val value = evaluate(expr.value)
-                environment.assign(expr.name, value)
+
+                val distance = locals[expr]
+                if (distance != null) {
+                    environment.assignAt(distance, expr.name, value)
+                } else {
+                    globals.assign(expr.name, value)
+                }
+
                 value
             }
             is Expr.Logical -> {
@@ -216,9 +223,9 @@ class Interpreter {
     // using the depth/distance it got from the resolver pass.
     // If the variable is not found in the environment, it looks up the variable in the globals.
     private fun lookUpVariable(name: Token, expr: Expr): Any? {
-        val depth = locals[expr]
-        return if (depth != null) {
-            environment.getAt(depth, name)
+        val distance = locals[expr]
+        return if (distance != null) {
+            environment.getAt(distance, name)
         } else {
             globals.get(name)
         }

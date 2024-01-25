@@ -13,6 +13,10 @@ class Environment(private val enclosing: Environment?) {
         }
     }
 
+    fun getAt(distance: Int, name: Token): Any? {
+        return ancestor(distance).values[name.lexeme]
+    }
+
     fun assign(name: Token, value: Any?): Unit =
         when {
             contains(name.lexeme) -> define(name.lexeme, value)
@@ -20,8 +24,8 @@ class Environment(private val enclosing: Environment?) {
             else -> throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.")
         }
 
-    fun getAt(distance: Int, name: Token): Any? {
-        return ancestor(distance).values[name.lexeme]
+    fun assignAt(distance: Int, name: Token, value: Any?): Unit {
+        ancestor(distance).values[name.lexeme] = value
     }
 
     // This walks a fixed number of hops up the parent chain and returns the environment there
