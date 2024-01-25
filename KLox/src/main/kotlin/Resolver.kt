@@ -15,7 +15,11 @@ class Resolver(private val interpreter: Interpreter) {
                 resolve(stmt.statements)
                 endScope()
             }
-            is Stmt.Expression -> resolveExpr(stmt.expression)
+            is Stmt.Var -> {
+                declare(stmt.name)
+                resolveExpr(stmt.initializer)
+                define(stmt.name)
+            }
             is Stmt.Function -> {
                 // Unlike variables, we define the name eagerly,
                 // before resolving the function’s body.
@@ -26,18 +30,16 @@ class Resolver(private val interpreter: Interpreter) {
                 // In a static analysis, we immediately traverse into the body right then and there.
                 resolveFunction(stmt)
             }
+            is Stmt.Expression -> resolveExpr(stmt.expression)
             is Stmt.If -> {
+                // Static analysis analyzes any branch that could be run.
+                // Since either one could be reached at runtime, we resolve both.
                 resolveExpr(stmt.condition)
                 resolveStmt(stmt.thenBranch)
                 if (stmt.elseBranch != null) resolveStmt(stmt.elseBranch)
             }
             is Stmt.Print -> resolveExpr(stmt.expression)
             is Stmt.Return -> stmt.value?.let { resolveExpr(it) }
-            is Stmt.Var -> {
-                declare(stmt.name)
-                resolveExpr(stmt.initializer)
-                define(stmt.name)
-            }
             is Stmt.While -> {
                 resolveExpr(stmt.condition)
                 resolveStmt(stmt.body)
@@ -48,21 +50,6 @@ class Resolver(private val interpreter: Interpreter) {
 
     private fun resolveExpr(expr: Expr) {
         when (expr) {
-            is Expr.Assign -> {
-                // First, we resolve the expression for the assigned value in case
-                // it also contains references to other variables.
-                resolveExpr(expr.value)
-                resolveLocal(expr, expr.name)
-            }
-            is Expr.Binary -> resolveExpr(expr.left)
-            is Expr.Call -> {
-                resolveExpr(expr.callee)
-                expr.arguments.forEach { resolveExpr(it) }
-            }
-            is Expr.Grouping -> resolveExpr(expr.expression)
-            is Expr.Literal -> {}
-            is Expr.Logical -> resolveExpr(expr.left)
-            is Expr.Unary -> resolveExpr(expr.right)
             is Expr.Variable -> {
                 if (scopes.isEmpty()) return
 
@@ -76,6 +63,30 @@ class Resolver(private val interpreter: Interpreter) {
                     resolveLocal(expr, expr.name)
                 }
             }
+            is Expr.Assign -> {
+                // First, we resolve the expression for the assigned value in case
+                // it also contains references to other variables.
+                resolveExpr(expr.value)
+                resolveLocal(expr, expr.name)
+            }
+            is Expr.Binary -> {
+                resolveExpr(expr.left)
+                resolveExpr(expr.right)
+            }
+            is Expr.Call -> {
+                resolveExpr(expr.callee)
+                expr.arguments.forEach { resolveExpr(it) }
+            }
+            is Expr.Grouping -> resolveExpr(expr.expression)
+            is Expr.Literal -> {
+                // A literal expression does not mention any variables and
+                // does not contain any subexpressions so there is no work to do.
+            }
+            is Expr.Logical -> {
+                resolveExpr(expr.left)
+                resolveExpr(expr.right)
+            }
+            is Expr.Unary -> resolveExpr(expr.right)
             else -> {} // do nothing, we don't care about other expressions yet.
         }
     }
