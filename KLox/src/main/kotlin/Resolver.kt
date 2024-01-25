@@ -129,6 +129,13 @@ class Resolver(private val interpreter: Interpreter) {
         if (scopes.isEmpty()) return
 
         val scope = scopes.peek()
+
+        // When we declare a variable in a local scope, we already know the names of every variable
+        // previously declared in that same scope. If we see a collision, we report an error.
+        if (scope.containsKey(name.lexeme)) {
+            Lox.error(name, "Already a variable with this name in this scope.")
+        }
+
         scope[name.lexeme] = false
     }
 
