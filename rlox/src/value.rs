@@ -15,6 +15,10 @@ impl ValueArray {
         count
     }
 
+    pub fn read(&self, index: usize) -> Value {
+        self.values[index]
+    }
+
     pub fn print_value(&self, index: usize) {
         print!("{}", self.values[index]);
     }

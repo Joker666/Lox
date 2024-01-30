@@ -42,6 +42,10 @@ impl Chunk {
         self.constants.write(value) as u8
     }
 
+    pub fn get_constant(&self, index: usize) -> Value {
+        self.constants.read(index)
+    }
+
     pub fn disassemble<T: ToString>(&self, name: T) {
         println!("== {} ==", name.to_string());
 
