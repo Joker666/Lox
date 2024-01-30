@@ -13,7 +13,7 @@ pub struct Chunk {
 
 impl Chunk {
     pub fn new() -> Self {
-        Chunk {
+        Self {
             code: Vec::new(),
             lines: Vec::new(),
             constants: ValueArray::new(),
@@ -23,6 +23,10 @@ impl Chunk {
     pub fn write(&mut self, byte: u8, line: usize) {
         self.code.push(byte);
         self.lines.push(line);
+    }
+
+    pub fn read(&self, ip: usize) -> u8 {
+        self.code[ip]
     }
 
     pub fn write_opcode(&mut self, opcode: OpCode, line: usize) {
@@ -50,6 +54,7 @@ impl Chunk {
     fn disassemble_instruction(&self, offset: usize) -> usize {
         print!("{:04} ", offset);
 
+        // Show a | for any instruction that comes from the same source line as the preceding one
         if offset > 0 && self.lines[offset] == self.lines[offset - 1] {
             print!("   | ");
         } else {
