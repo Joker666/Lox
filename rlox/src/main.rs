@@ -13,8 +13,7 @@ fn main() {
     chunk.write_opcode(OpCode::OpConstant, 123);
     chunk.write(constant, 123);
 
-    chunk.write_opcode(OpCode::OpReturn, 124);
-    chunk.disassemble("test chunk");
+    chunk.write_opcode(OpCode::OpReturn, 123);
 
     vm.interpret(&chunk);
 

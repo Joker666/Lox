@@ -22,13 +22,18 @@ impl VM {
 
     pub fn run(&mut self, chunk: &Chunk) -> InterpretResult {
         loop {
+            #[cfg(feature = "debug_trace_exec")]
+            chunk.disassemble_instruction(self.ip);
+
             let op_code = self.read_byte(chunk);
-            return match op_code {
-                OpCode::OpReturn => InterpretResult::Ok,
+
+            match op_code {
+                OpCode::OpReturn => {
+                    return InterpretResult::Ok;
+                }
                 OpCode::OpConstant => {
                     let constant = self.read_constant(chunk);
                     println!("{}", constant);
-                    InterpretResult::Ok
                 }
             };
         }

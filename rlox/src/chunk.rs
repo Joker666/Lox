@@ -55,7 +55,7 @@ impl Chunk {
         }
     }
 
-    fn disassemble_instruction(&self, offset: usize) -> usize {
+    pub fn disassemble_instruction(&self, offset: usize) -> usize {
         print!("{:04} ", offset);
 
         // Show a | for any instruction that comes from the same source line as the preceding one
