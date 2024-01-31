@@ -7,7 +7,7 @@ abstract class Stmt {
 
     class Function(val name: Token, val params: List<Token>, val body: List<Stmt>) : Stmt()
 
-    class Return(val name: Token, val value: Expr?) : Stmt()
+    class Return(val keyword: Token, val value: Expr?) : Stmt()
 
     class Block(val statements: List<Stmt>) : Stmt()
 
