@@ -16,11 +16,8 @@ class Resolver(private val interpreter: Interpreter) {
 
     private fun resolveStmt(stmt: Stmt) {
         when (stmt) {
-            is Stmt.Block -> {
-                beginScope()
-                resolve(stmt.statements)
-                endScope()
-            }
+            is Stmt.Expression -> resolveExpr(stmt.expression)
+            is Stmt.Print -> resolveExpr(stmt.expression)
             is Stmt.Var -> {
                 declare(stmt.name)
                 resolveExpr(stmt.initializer)
@@ -36,15 +33,6 @@ class Resolver(private val interpreter: Interpreter) {
                 // In a static analysis, we immediately traverse into the body right then and there.
                 resolveFunction(stmt, FunctionType.FUNCTION)
             }
-            is Stmt.Expression -> resolveExpr(stmt.expression)
-            is Stmt.If -> {
-                // Static analysis analyzes any branch that could be run.
-                // Since either one could be reached at runtime, we resolve both.
-                resolveExpr(stmt.condition)
-                resolveStmt(stmt.thenBranch)
-                if (stmt.elseBranch != null) resolveStmt(stmt.elseBranch)
-            }
-            is Stmt.Print -> resolveExpr(stmt.expression)
             is Stmt.Return -> {
                 if (currentFunction == FunctionType.NONE) {
                     Lox.error(stmt.keyword, "Can't return from top-level code.")
@@ -52,9 +40,21 @@ class Resolver(private val interpreter: Interpreter) {
 
                 stmt.value?.let { resolveExpr(it) }
             }
+            is Stmt.If -> {
+                // Static analysis analyzes any branch that could be run.
+                // Since either one could be reached at runtime, we resolve both.
+                resolveExpr(stmt.condition)
+                resolveStmt(stmt.thenBranch)
+                if (stmt.elseBranch != null) resolveStmt(stmt.elseBranch)
+            }
             is Stmt.While -> {
                 resolveExpr(stmt.condition)
                 resolveStmt(stmt.body)
+            }
+            is Stmt.Block -> {
+                beginScope()
+                resolve(stmt.statements)
+                endScope()
             }
             else -> {} // do nothing, we don't care about other statements yet.
         }

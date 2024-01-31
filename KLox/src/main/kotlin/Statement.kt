@@ -9,8 +9,6 @@ abstract class Stmt {
 
     class Return(val keyword: Token, val value: Expr?) : Stmt()
 
-    class Block(val statements: List<Stmt>) : Stmt()
-
     class Break : Stmt()
 
     class Continue : Stmt()
@@ -18,6 +16,8 @@ abstract class Stmt {
     class If(val condition: Expr, val thenBranch: Stmt, val elseBranch: Stmt?) : Stmt()
 
     class While(val condition: Expr, val body: Stmt, val increment: Expr?) : Stmt()
+
+    class Block(val statements: List<Stmt>) : Stmt()
 
     object Empty : Stmt()
 }
