@@ -15,7 +15,7 @@ enum class ExitCodes(val value: Int) {
      * The input data was incorrect in some way. This should only be used for user's data and not
      * system files.
      */
-    DATAERR(65),
+    DATA_ERR(65),
 
     /**
      * An internal software error has been detected. This should be limited to non-operating system

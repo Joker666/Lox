@@ -31,7 +31,7 @@ object Lox {
         run(String(bytes, Charset.defaultCharset()))
 
         // Indicate an error in the exit code.
-        if (hadError) exitProcess(ExitCodes.DATAERR.value)
+        if (hadError) exitProcess(ExitCodes.DATA_ERR.value)
         if (hadRuntimeError) exitProcess(ExitCodes.SOFTWARE.value)
     }
 
