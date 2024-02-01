@@ -20,10 +20,6 @@ impl VM {
         }
     }
 
-    pub fn reset_stack(&mut self) {
-        self.stack = Vec::new();
-    }
-
     pub fn interpret(&mut self, chunk: &Chunk) -> InterpretResult {
         self.run(chunk)
     }
@@ -44,7 +40,7 @@ impl VM {
 
             match op_code {
                 OpCode::OpReturn => {
-                    println!("{:?}", self.stack.pop());
+                    println!("{:?}", self.stack.pop().unwrap());
                     return InterpretResult::Ok;
                 }
                 OpCode::OpConstant => {
