@@ -3,6 +3,7 @@ use crate::value::*;
 pub enum OpCode {
     OpConstant = 0,
     OpReturn = 1,
+    OpNegate = 2,
 }
 
 pub struct Chunk {
@@ -70,6 +71,7 @@ impl Chunk {
         match instruction {
             OpCode::OpConstant => self.constant_instruction("OP_CONSTANT", offset),
             OpCode::OpReturn => self.simple_instruction("OP_RETURN", offset),
+            OpCode::OpNegate => self.simple_instruction("OP_NEGATE", offset),
         }
     }
 
@@ -92,6 +94,7 @@ impl From<u8> for OpCode {
         match value {
             0 => OpCode::OpConstant,
             1 => OpCode::OpReturn,
+            2 => OpCode::OpNegate,
             _ => panic!("Invalid OpCode"),
         }
     }
