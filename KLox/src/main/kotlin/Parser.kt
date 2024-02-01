@@ -118,13 +118,13 @@ internal class Parser(private val tokens: List<Token>) {
     private fun forStatement(): Stmt {
         consume(LEFT_PAREN, "Expect '(' after 'for'.")
         val initializer: Stmt? =
-            if (match(SEMICOLON)) {
-                null
-            } else if (match(VAR)) {
-                varDeclaration()
-            } else {
-                expressionStatement()
-            }
+                if (match(SEMICOLON)) {
+                    null
+                } else if (match(VAR)) {
+                    varDeclaration()
+                } else {
+                    expressionStatement()
+                }
 
         var condition: Expr = Expr.Literal(true) // infinite like the while loop
         if (!check(SEMICOLON)) {
@@ -297,7 +297,7 @@ internal class Parser(private val tokens: List<Token>) {
     }
 
     // unary         → ( "!" | "-" ) unary
-    //               | primary ;
+    //               | call ;
     private fun unary(): Expr {
         if (match(BANG, MINUS)) {
             val operator = previous()
@@ -368,14 +368,7 @@ internal class Parser(private val tokens: List<Token>) {
             // Most statements start with a keyword—for, if, return, var, etc. When the next token
             // is any of those, we’re probably about to start a statement.
             when (current().type) {
-                CLASS,
-                FUN,
-                VAR,
-                FOR,
-                IF,
-                WHILE,
-                PRINT,
-                RETURN -> return
+                CLASS, FUN, VAR, FOR, IF, WHILE, PRINT, RETURN -> return
                 else -> {
                     advance()
                 }
