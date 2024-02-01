@@ -1,8 +1,14 @@
 import java.util.*
 
+private enum class FunctionType {
+    NONE,
+    FUNCTION
+}
+
 class Resolver(private val interpreter: Interpreter) {
     // Each element in the stack is a Map representing a single block scope.
     private val scopes = Stack<MutableMap<String, Boolean>>()
+    private var currentFunction = FunctionType.NONE
 
     internal fun resolve(statements: List<Stmt>) {
         statements.forEach { resolveStmt(it) }
@@ -10,11 +16,8 @@ class Resolver(private val interpreter: Interpreter) {
 
     private fun resolveStmt(stmt: Stmt) {
         when (stmt) {
-            is Stmt.Block -> {
-                beginScope()
-                resolve(stmt.statements)
-                endScope()
-            }
+            is Stmt.Expression -> resolveExpr(stmt.expression)
+            is Stmt.Print -> resolveExpr(stmt.expression)
             is Stmt.Var -> {
                 declare(stmt.name)
                 resolveExpr(stmt.initializer)
@@ -28,9 +31,15 @@ class Resolver(private val interpreter: Interpreter) {
                 define(stmt.name)
 
                 // In a static analysis, we immediately traverse into the body right then and there.
-                resolveFunction(stmt)
+                resolveFunction(stmt, FunctionType.FUNCTION)
             }
-            is Stmt.Expression -> resolveExpr(stmt.expression)
+            is Stmt.Return -> {
+                if (currentFunction == FunctionType.NONE) {
+                    Lox.error(stmt.keyword, "Can't return from top-level code.")
+                }
+
+                stmt.value?.let { resolveExpr(it) }
+            }
             is Stmt.If -> {
                 // Static analysis analyzes any branch that could be run.
                 // Since either one could be reached at runtime, we resolve both.
@@ -38,11 +47,14 @@ class Resolver(private val interpreter: Interpreter) {
                 resolveStmt(stmt.thenBranch)
                 if (stmt.elseBranch != null) resolveStmt(stmt.elseBranch)
             }
-            is Stmt.Print -> resolveExpr(stmt.expression)
-            is Stmt.Return -> stmt.value?.let { resolveExpr(it) }
             is Stmt.While -> {
                 resolveExpr(stmt.condition)
                 resolveStmt(stmt.body)
+            }
+            is Stmt.Block -> {
+                beginScope()
+                resolve(stmt.statements)
+                endScope()
             }
             else -> {} // do nothing, we don't care about other statements yet.
         }
@@ -107,7 +119,10 @@ class Resolver(private val interpreter: Interpreter) {
         }
     }
 
-    private fun resolveFunction(function: Stmt.Function) {
+    private fun resolveFunction(function: Stmt.Function, type: FunctionType) {
+        val enclosingFunction = currentFunction
+        currentFunction = type
+
         beginScope()
         for (param in function.params) {
             declare(param)
@@ -115,6 +130,8 @@ class Resolver(private val interpreter: Interpreter) {
         }
         resolve(function.body)
         endScope()
+
+        currentFunction = enclosingFunction
     }
 
     private fun beginScope() {

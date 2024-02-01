@@ -45,14 +45,14 @@ class Interpreter {
     private fun execute(statements: List<Stmt>) {
         statements.forEach {
             when (it) {
-                is Stmt.Print -> println(stringify(evaluate(it.expression)))
                 is Stmt.Expression -> evaluate(it.expression)
+                is Stmt.Print -> println(stringify(evaluate(it.expression)))
+                is Stmt.Var -> environment.define(it.name.lexeme, evaluate(it.initializer))
                 is Stmt.Function -> environment.define(it.name.lexeme, LoxFunction(it, environment))
                 is Stmt.Return -> executeReturn(it)
-                is Stmt.Var -> environment.define(it.name.lexeme, evaluate(it.initializer))
-                is Stmt.If -> executeIf(it)
                 is Stmt.Break -> throw BreakException()
                 is Stmt.Continue -> throw ContinueException()
+                is Stmt.If -> executeIf(it)
                 is Stmt.While -> executeWhile(it)
                 is Stmt.Block -> executeBlock(it.statements, Environment(enclosing = environment))
                 else -> {}
