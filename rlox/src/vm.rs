@@ -39,18 +39,22 @@ impl VM {
             let op_code = self.read_byte(chunk);
 
             match op_code {
-                OpCode::OpReturn => {
+                OpCode::Return => {
                     println!("{:?}", self.stack.pop().unwrap());
                     return InterpretResult::Ok;
                 }
-                OpCode::OpConstant => {
+                OpCode::Constant => {
                     let constant = self.read_constant(chunk);
                     self.stack.push(constant);
                 }
-                OpCode::OpNegate => {
+                OpCode::Negate => {
                     let value = self.stack.pop().unwrap();
                     self.stack.push(-value);
                 }
+                OpCode::Add => self.binary_op(|a, b| a + b),
+                OpCode::Subtract => self.binary_op(|a, b| a - b),
+                OpCode::Multiply => self.binary_op(|a, b| a * b),
+                OpCode::Divide => self.binary_op(|a, b| a / b),
             };
         }
     }
@@ -65,6 +69,16 @@ impl VM {
         let index = chunk.read(self.ip) as usize;
         self.ip += 1;
         chunk.get_constant(index)
+    }
+
+    // When the operands themselves are calculated, the left is evaluated first, then the right.
+    // That means the left operand gets pushed before the right operand.
+    // So the right operand will be on top of the stack.
+    // That's why we assign the first popped operand to b.
+    pub fn binary_op(&mut self, op: fn(a: Value, b: Value) -> Value) {
+        let b = self.stack.pop().unwrap();
+        let a = self.stack.pop().unwrap();
+        self.stack.push(op(a, b));
     }
 
     pub fn free(&mut self) {}
