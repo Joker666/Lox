@@ -33,6 +33,10 @@ class Resolver(private val interpreter: Interpreter) {
                 // In a static analysis, we immediately traverse into the body right then and there.
                 resolveFunction(stmt, FunctionType.FUNCTION)
             }
+            is Stmt.Class -> {
+                declare(stmt.name)
+                define(stmt.name)
+            }
             is Stmt.Return -> {
                 if (currentFunction == FunctionType.NONE) {
                     Lox.error(stmt.keyword, "Can't return from top-level code.")

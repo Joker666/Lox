@@ -49,6 +49,7 @@ class Interpreter {
                 is Stmt.Print -> println(stringify(evaluate(it.expression)))
                 is Stmt.Var -> environment.define(it.name.lexeme, evaluate(it.initializer))
                 is Stmt.Function -> environment.define(it.name.lexeme, LoxFunction(it, environment))
+                is Stmt.Class -> executeClass(it)
                 is Stmt.Return -> executeReturn(it)
                 is Stmt.Break -> throw BreakException()
                 is Stmt.Continue -> throw ContinueException()
@@ -62,6 +63,16 @@ class Interpreter {
 
     fun resolve(expr: Expr, depth: Int) {
         locals[expr] = depth
+    }
+
+    // executeClass executes a class statement.
+    private fun executeClass(stmt: Stmt.Class) {
+        environment.define(stmt.name.lexeme, null)
+        val klass = LoxClass(stmt.name.lexeme)
+
+        // That two-stage variable binding process allows references to the class inside its own
+        // methods.
+        environment.assign(stmt.name, klass)
     }
 
     // executeReturn executes a return statement.
