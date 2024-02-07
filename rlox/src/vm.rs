@@ -1,4 +1,5 @@
 use crate::chunk::*;
+use crate::compiler::*;
 use crate::value::*;
 
 pub enum InterpretResult {
@@ -20,8 +21,10 @@ impl VM {
         }
     }
 
-    pub fn interpret(&mut self, chunk: &Chunk) -> InterpretResult {
-        self.run(chunk)
+    pub fn interpret(&mut self, source: &String) -> InterpretResult {
+        let compiler = Compiler::new();
+        compiler.compile(source);
+        InterpretResult::Ok
     }
 
     pub fn run(&mut self, chunk: &Chunk) -> InterpretResult {
