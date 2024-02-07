@@ -19,5 +19,7 @@ abstract class Stmt {
 
     class Block(val statements: List<Stmt>) : Stmt()
 
+    class Class(val name: Token, val methods: List<Function>) : Stmt()
+
     object Empty : Stmt()
 }

@@ -20,11 +20,13 @@ internal class Parser(private val tokens: List<Token>) {
         return statements
     }
 
-    // declaration   → funDecl
+    // declaration   → classDecl
+    //               | funDecl
     //               | varDecl
     //               | statement ;
     private fun declaration(): Stmt {
         return try {
+            if (match(CLASS)) return classDeclaration()
             if (match(FUN)) return funDeclaration(FunctionKind.FUNCTION)
             if (match(VAR)) return varDeclaration()
 
@@ -33,6 +35,20 @@ internal class Parser(private val tokens: List<Token>) {
             synchronize()
             Stmt.Empty
         }
+    }
+
+    // classDecl     → "class" IDENTIFIER "{" function* "}" ;
+    private fun classDeclaration(): Stmt {
+        val name = consume(IDENTIFIER, "Expect class name.")
+        consume(LEFT_BRACE, "Expect '{' before class body.")
+
+        val methods = mutableListOf<Stmt.Function>()
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            methods.add(funDeclaration(FunctionKind.METHOD) as Stmt.Function)
+        }
+
+        consume(RIGHT_BRACE, "Expect '}' after class body.")
+        return Stmt.Class(name, methods)
     }
 
     // funDecl       → "fun" function ;
@@ -118,13 +134,13 @@ internal class Parser(private val tokens: List<Token>) {
     private fun forStatement(): Stmt {
         consume(LEFT_PAREN, "Expect '(' after 'for'.")
         val initializer: Stmt? =
-                if (match(SEMICOLON)) {
-                    null
-                } else if (match(VAR)) {
-                    varDeclaration()
-                } else {
-                    expressionStatement()
-                }
+            if (match(SEMICOLON)) {
+                null
+            } else if (match(VAR)) {
+                varDeclaration()
+            } else {
+                expressionStatement()
+            }
 
         var condition: Expr = Expr.Literal(true) // infinite like the while loop
         if (!check(SEMICOLON)) {
@@ -368,7 +384,14 @@ internal class Parser(private val tokens: List<Token>) {
             // Most statements start with a keyword—for, if, return, var, etc. When the next token
             // is any of those, we’re probably about to start a statement.
             when (current().type) {
-                CLASS, FUN, VAR, FOR, IF, WHILE, PRINT, RETURN -> return
+                CLASS,
+                FUN,
+                VAR,
+                FOR,
+                IF,
+                WHILE,
+                PRINT,
+                RETURN -> return
                 else -> {
                     advance()
                 }
