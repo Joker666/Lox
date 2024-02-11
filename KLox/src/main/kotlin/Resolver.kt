@@ -94,6 +94,10 @@ class Resolver(private val interpreter: Interpreter) {
                 expr.arguments.forEach { resolveExpr(it) }
             }
             is Expr.Get -> resolveExpr(expr.loxObject)
+            is Expr.Set -> {
+                resolveExpr(expr.loxObject)
+                resolveExpr(expr.value)
+            }
             is Expr.Grouping -> resolveExpr(expr.expression)
             is Expr.Literal -> {
                 // A literal expression does not mention any variables and
