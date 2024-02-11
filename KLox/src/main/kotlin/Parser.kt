@@ -329,6 +329,13 @@ internal class Parser(private val tokens: List<Token>) {
         while (true) {
             if (match(LEFT_PAREN)) {
                 expr = finishCall(expr)
+            } else if (match(DOT)) {
+                val name = consume(IDENTIFIER, "Expect property name after '.'.")
+                expr =
+                    Expr.Get(
+                        expr,
+                        name
+                    ) // expr becomes the loxObject and name becomes the property/method
             } else {
                 break
             }

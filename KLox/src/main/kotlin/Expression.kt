@@ -15,5 +15,7 @@ abstract class Expr {
 
     internal class Assign(val name: Token, val value: Expr) : Expr()
 
+    internal class Get(val loxObject: Expr, val name: Token) : Expr()
+
     object Empty : Expr()
 }
