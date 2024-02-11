@@ -243,7 +243,7 @@ internal class Parser(private val tokens: List<Token>) {
             } else if (expr is Expr.Get) {
                 // We parse the left-hand side as a normal expression (there could be many dots).
                 // Then, when we stumble onto the equal sign after it, we take the expression we
-                // already parsed and transform it into Set expression.
+                // already parsed and transform it into Set expression. Clever tactic.
                 return Expr.Set(expr.loxObject, expr.name, value)
             }
             error(equals, "Invalid assignment target.")
