@@ -5,13 +5,9 @@ class LoxTest {
     fun run() {
         Lox.run(
             """
-class DevonshireCream {
-  serveOn() {
-    return "Scones";
-  }
-}
-
-print DevonshireCream; // Prints "DevonshireCream".
+class Bagel {}
+var bagel = Bagel();
+print bagel; // Prints "Bagel instance".
 """
         )
     }
