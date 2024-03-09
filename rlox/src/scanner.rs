@@ -1,4 +1,5 @@
 use std::fmt;
+use std::thread::current;
 
 pub struct Scanner {
     source: Vec<char>,
@@ -176,11 +177,15 @@ impl Scanner {
     }
 
     fn identifier(&mut self) -> Token {
-        while self.current().is_alphanumeric() {
+        while self.is_alphanumeric(self.current()) {
             self.advance();
         }
 
         self.make_token(self.identifier_type())
+    }
+
+    fn is_alphanumeric(&self, c: char) -> bool {
+        c.is_alphanumeric() || c == '_'
     }
 
     fn identifier_type(&self) -> TokenType {
