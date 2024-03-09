@@ -20,7 +20,7 @@ fn main() {
         2 => run_file(&mut vm, &args[1]),
         _ => {
             println!("Usage: rlox [path]");
-            std::process::exit(64);
+            exit(64);
         }
     }
 
