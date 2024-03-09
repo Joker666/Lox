@@ -23,10 +23,17 @@ impl Scanner {
         }
     }
 
+    /// Returns the current character in the source code.
+    ///
+    /// This is used to scan through each character
+    /// in the source code during lexical analysis.
     fn current(&self) -> char {
         self.source[self.current]
     }
 
+    /// Returns the next character in the source code without consuming it.
+    /// Returns '\0' if at the end of the source code. Used to look ahead
+    /// when scanning through the source code.
     fn peek(&self) -> char {
         if self.is_at_end() {
             '\0'
@@ -120,9 +127,34 @@ impl Scanner {
         true
     }
 
+    /// advances the current position and returns the character at the new position.
     fn advance(&mut self) -> char {
         self.current += 1;
         self.source[self.current - 1]
+    }
+
+    /// Parses a string token from the source code.
+    ///
+    /// Advances the current position through the string, handling escaped
+    /// characters and tracking the current line. If the end of the string is
+    /// reached without finding a closing quote, returns an error token.
+    /// Otherwise, makes a string token from the lexeme.
+    fn string(&mut self) -> Token {
+        while self.current() != '"' && !self.is_at_end() {
+            if self.current() == '\n' {
+                self.line += 1;
+            }
+            self.advance();
+        }
+
+        if self.is_at_end() {
+            return self.error_token("Unterminated string.");
+        }
+
+        // The closing ".
+        self.advance();
+
+        self.make_token(TokenType::String)
     }
 
     fn number(&mut self) -> Token {
