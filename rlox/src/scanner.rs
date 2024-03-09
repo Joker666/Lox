@@ -64,26 +64,34 @@ impl Scanner {
             '+' => self.make_token(TokenType::Plus),
             '/' => self.make_token(TokenType::Slash),
             '*' => self.make_token(TokenType::Star),
-            '!' => self.make_token(if self.is_match('=') {
-                TokenType::BangEqual
-            } else {
-                TokenType::Bang
-            }),
-            '=' => self.make_token(if self.is_match('=') {
-                TokenType::EqualEqual
-            } else {
-                TokenType::Equal
-            }),
-            '<' => self.make_token(if self.is_match('=') {
-                TokenType::LessEqual
-            } else {
-                TokenType::Less
-            }),
-            '>' => self.make_token(if self.is_match('=') {
-                TokenType::GreaterEqual
-            } else {
-                TokenType::Greater
-            }),
+            '!' => {
+                if self.match_and_advance('=') {
+                    self.make_token(TokenType::BangEqual)
+                } else {
+                    self.make_token(TokenType::Bang)
+                }
+            }
+            '=' => {
+                if self.match_and_advance('=') {
+                    self.make_token(TokenType::EqualEqual)
+                } else {
+                    self.make_token(TokenType::Equal)
+                }
+            }
+            '<' => {
+                if self.match_and_advance('=') {
+                    self.make_token(TokenType::LessEqual)
+                } else {
+                    self.make_token(TokenType::Less)
+                }
+            }
+            '>' => {
+                if self.match_and_advance('=') {
+                    self.make_token(TokenType::GreaterEqual)
+                } else {
+                    self.make_token(TokenType::Greater)
+                }
+            }
             _ => self.error_token("Unexpected character."),
         }
     }
@@ -100,12 +108,16 @@ impl Scanner {
         self.current >= self.source.len()
     }
 
-    fn is_match(&self, expected: char) -> bool {
+    fn match_and_advance(&mut self, expected: char) -> bool {
         if self.is_at_end() {
-            false
-        } else {
-            self.source[self.current] == expected
+            return false;
         }
+        if self.source[self.current] != expected {
+            return false;
+        }
+
+        self.current += 1;
+        true
     }
 
     fn advance(&mut self) -> char {
