@@ -36,7 +36,7 @@ impl Scanner {
     }
 
     pub fn scan_token(&mut self) -> Token {
-        self.skip_whitespace();
+        self.skip_ignored();
         self.start = self.current;
 
         if self.is_at_end() {
@@ -173,11 +173,31 @@ impl Scanner {
         }
     }
 
-    fn skip_whitespace(&mut self) {
-        while !self.is_at_end() {
-            let c = self.advance();
-            if c == '\n' {
-                self.line += 1;
+    /// Skips over any whitespace and comments until non-ignored
+    /// characters are reached. Increments the line counter when
+    /// newlines are encountered.
+    fn skip_ignored(&mut self) {
+        loop {
+            let c = self.current();
+            match c {
+                ' ' | '\r' | '\t' => {
+                    self.advance();
+                }
+                '\n' => {
+                    self.line += 1;
+                    self.advance();
+                }
+                '/' => {
+                    if self.peek() == '/' {
+                        // A comment goes until the end of the line.
+                        while self.current() != '\n' && !self.is_at_end() {
+                            self.advance();
+                        }
+                    } else {
+                        return;
+                    }
+                }
+                _ => return,
             }
         }
     }
