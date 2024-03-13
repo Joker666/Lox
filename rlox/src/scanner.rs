@@ -188,24 +188,63 @@ impl Scanner {
         c.is_alphanumeric() || c == '_'
     }
 
+    /// Checks if the current keyword lexeme matches the expected keyword type.
+    /// Compares the lexeme to the provided `rest` keyword string, starting from
+    /// `start` index for `length` characters. If it matches, returns `token_type`.
+    /// Otherwise returns the type of the actual keyword lexeme.
+    fn check_keyword(
+        &self,
+        start: usize,
+        length: usize,
+        rest: &str,
+        token_type: TokenType,
+    ) -> TokenType {
+        let text: String = self.source[start..start + length].iter().collect();
+        if text.as_str() == rest {
+            return token_type;
+        }
+
+        TokenType::Identifier
+    }
+
+    /// Checks the current identifier lexeme and returns the corresponding token type.
+    /// Handles keywords like 'if', 'else', 'for', etc. as well as identifiers.
     fn identifier_type(&self) -> TokenType {
-        match self.get_text().as_str() {
-            "and" => TokenType::And,
-            "class" => TokenType::Class,
-            "else" => TokenType::Else,
-            "false" => TokenType::False,
-            "for" => TokenType::For,
-            "fun" => TokenType::Fun,
-            "if" => TokenType::If,
-            "nil" => TokenType::Nil,
-            "or" => TokenType::Or,
-            "print" => TokenType::Print,
-            "return" => TokenType::Return,
-            "super" => TokenType::Super,
-            "this" => TokenType::This,
-            "true" => TokenType::True,
-            "var" => TokenType::Var,
-            "while" => TokenType::While,
+        match self.source[self.start] {
+            'a' => self.check_keyword(self.start, 2, "nd", TokenType::And),
+            'c' => self.check_keyword(self.start, 4, "lass", TokenType::Class),
+            'e' => self.check_keyword(self.start, 3, "lse", TokenType::Else),
+            'f' => {
+                if self.current - self.start > 1 {
+                    match self.source[self.start + 1] {
+                        'a' => self.check_keyword(self.start, 3, "lse", TokenType::False),
+                        'o' => self.check_keyword(self.start, 1, "r", TokenType::For),
+                        'u' => self.check_keyword(self.start, 1, "n", TokenType::Fun),
+                        _ => TokenType::Identifier,
+                    }
+                } else {
+                    TokenType::Identifier
+                }
+            }
+            'i' => self.check_keyword(self.start, 1, "f", TokenType::If),
+            'n' => self.check_keyword(self.start, 2, "il", TokenType::Nil),
+            'o' => self.check_keyword(self.start, 1, "r", TokenType::Or),
+            'p' => self.check_keyword(self.start, 4, "rint", TokenType::Print),
+            'r' => self.check_keyword(self.start, 5, "eturn", TokenType::Return),
+            's' => self.check_keyword(self.start, 4, "uper", TokenType::Super),
+            't' => {
+                if self.current - self.start > 1 {
+                    match self.source[self.start + 1] {
+                        'h' => self.check_keyword(self.start, 2, "is", TokenType::This),
+                        'r' => self.check_keyword(self.start, 2, "ue", TokenType::True),
+                        _ => TokenType::Identifier,
+                    }
+                } else {
+                    TokenType::Identifier
+                }
+            }
+            'v' => self.check_keyword(self.start, 2, "ar", TokenType::Var),
+            'w' => self.check_keyword(self.start, 4, "hile", TokenType::While),
             _ => TokenType::Identifier,
         }
     }
