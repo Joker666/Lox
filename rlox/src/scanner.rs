@@ -1,5 +1,4 @@
 use std::fmt;
-use std::thread::current;
 
 pub struct Scanner {
     source: Vec<char>,
