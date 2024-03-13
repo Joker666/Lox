@@ -10,6 +10,11 @@ use std::io::{stdin, stdout, Write};
 use std::process::exit;
 use vm::*;
 
+pub enum InterpretError {
+    CompileError,
+    RuntimeError,
+}
+
 fn main() {
     let mut vm = VM::new();
 
@@ -35,15 +40,15 @@ fn run_prompt(vm: &mut VM) {
         let mut line = String::new();
         stdin().read_line(&mut line).unwrap();
 
-        vm.interpret(&line);
+        let _ = vm.interpret(&line);
     }
 }
 
 fn run_file(vm: &mut VM, path: &str) {
     let buf = read_to_string(path).unwrap();
     match vm.interpret(&buf) {
-        InterpretResult::Ok => {}
-        InterpretResult::CompileError => exit(65),
-        InterpretResult::RuntimeError => exit(70),
+        Err(InterpretError::CompileError) => exit(65),
+        Err(InterpretError::RuntimeError) => exit(70),
+        Ok(..) => exit(0),
     }
 }

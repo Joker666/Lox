@@ -1,12 +1,7 @@
 use crate::chunk::*;
 use crate::compiler::*;
 use crate::value::*;
-
-pub enum InterpretResult {
-    Ok,
-    CompileError,
-    RuntimeError,
-}
+use crate::InterpretError;
 
 pub struct VM {
     ip: usize, // instruction pointer
@@ -21,13 +16,15 @@ impl VM {
         }
     }
 
-    pub fn interpret(&mut self, source: &str) -> InterpretResult {
+    pub fn interpret(&mut self, source: &str) -> Result<(), InterpretError> {
         let compiler = Compiler::new();
-        compiler.compile(source);
-        InterpretResult::Ok
+        let chunk = compiler.compile(source)?;
+
+        self.ip = 0;
+        self.run(&chunk)
     }
 
-    pub fn run(&mut self, chunk: &Chunk) -> InterpretResult {
+    pub fn run(&mut self, chunk: &Chunk) -> Result<(), InterpretError> {
         loop {
             #[cfg(feature = "debug_trace_exec")]
             {
@@ -44,7 +41,7 @@ impl VM {
             match op_code {
                 OpCode::Return => {
                     println!("{:?}", self.stack.pop().unwrap());
-                    return InterpretResult::Ok;
+                    return Ok(());
                 }
                 OpCode::Constant => {
                     let constant = self.read_constant(chunk);
