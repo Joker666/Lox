@@ -24,22 +24,19 @@ impl Scanner {
         }
     }
 
-    /// Returns the current character in the source code.
-    ///
-    /// This is used to scan through each character
-    /// in the source code during lexical analysis.
     fn current(&self) -> char {
-        self.source[self.current]
-    }
-
-    /// Returns the next character in the source code without consuming it.
-    /// Returns '\0' if at the end of the source code. Used to look ahead
-    /// when scanning through the source code.
-    fn peek(&self) -> char {
         if self.is_at_end() {
             '\0'
         } else {
-            self.source[self.current + 1]
+            self.source[self.current]
+        }
+    }
+
+    fn peek(&self) -> Option<char> {
+        if self.is_at_end() {
+            None
+        } else {
+            Some(self.source[self.current + 1])
         }
     }
 
@@ -100,6 +97,7 @@ impl Scanner {
                     self.make_token(TokenType::Greater)
                 }
             }
+            '"' => self.string(),
             _ => self.error_token("Unexpected character."),
         }
     }
@@ -164,12 +162,15 @@ impl Scanner {
         }
 
         // Look for a fractional part.
-        if self.current() == '.' && self.peek().is_ascii_digit() {
-            // Consume the "."
-            self.advance();
-
-            while self.current().is_ascii_digit() {
-                self.advance();
+        if self.current() == '.' {
+            if let Some(i) = self.peek() {
+                if i.is_ascii_digit() {
+                    // Consume the "."
+                    self.advance();
+                    while self.current().is_ascii_digit() {
+                        self.advance();
+                    }
+                }
             }
         }
 
@@ -264,7 +265,7 @@ impl Scanner {
                     self.advance();
                 }
                 '/' => {
-                    if self.peek() == '/' {
+                    if let Some('/') = self.peek() {
                         // A comment goes until the end of the line.
                         while self.current() != '\n' && !self.is_at_end() {
                             self.advance();
