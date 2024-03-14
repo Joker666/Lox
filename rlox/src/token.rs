@@ -6,6 +6,16 @@ pub struct Token {
     pub line: usize,
 }
 
+impl Default for Token {
+    fn default() -> Self {
+        Self {
+            token_type: TokenType::Undefined,
+            lexeme: String::new(),
+            line: 0,
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum TokenType {
     LeftParen,
@@ -48,6 +58,7 @@ pub enum TokenType {
     While,
     Error,
     Eof,
+    Undefined,
 }
 
 impl fmt::Display for TokenType {
@@ -93,6 +104,7 @@ impl fmt::Display for TokenType {
             TokenType::While => write!(f, "WHILE"),
             TokenType::Error => write!(f, "ERROR"),
             TokenType::Eof => write!(f, "EOF"),
+            TokenType::Undefined => write!(f, "UNDEFINED"),
         }
     }
 }
