@@ -16,6 +16,16 @@ impl Default for Token {
     }
 }
 
+impl Clone for Token {
+    fn clone(&self) -> Self {
+        Self {
+            token_type: self.token_type,
+            lexeme: self.lexeme.clone(),
+            line: self.line,
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub enum TokenType {
     LeftParen,

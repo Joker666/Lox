@@ -17,7 +17,7 @@ impl VM {
     }
 
     pub fn interpret(&mut self, source: &str) -> Result<(), InterpretError> {
-        let compiler = Compiler::new();
+        let mut compiler = Compiler::new();
         let chunk = compiler.compile(source)?;
 
         self.ip = 0;
