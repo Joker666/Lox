@@ -68,10 +68,16 @@ class Interpreter {
     // executeClass executes a class statement.
     private fun executeClass(stmt: Stmt.Class) {
         environment.define(stmt.name.lexeme, null)
-        val klass = LoxClass(stmt.name.lexeme)
+
+        val methods: MutableMap<String, LoxFunction> = HashMap()
+        for (method in stmt.methods) {
+            val function = LoxFunction(method, environment)
+            methods[method.name.lexeme] = function
+        }
 
         // That two-stage variable binding process allows references to the class inside its own
         // methods.
+        val klass = LoxClass(stmt.name.lexeme, methods)
         environment.assign(stmt.name, klass)
     }
 

@@ -2,6 +2,7 @@ import java.util.*
 
 private enum class FunctionType {
     NONE,
+    METHOD,
     FUNCTION
 }
 
@@ -35,6 +36,12 @@ class Resolver(private val interpreter: Interpreter) {
             }
             is Stmt.Class -> {
                 declare(stmt.name)
+
+                for (method in stmt.methods) {
+                    val declaration: FunctionType = FunctionType.METHOD
+                    resolveFunction(method, declaration)
+                }
+
                 define(stmt.name)
             }
             is Stmt.Return -> {

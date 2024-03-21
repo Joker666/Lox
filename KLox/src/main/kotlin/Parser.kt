@@ -328,7 +328,7 @@ internal class Parser(private val tokens: List<Token>) {
         return call()
     }
 
-    // call          → primary ( "(" arguments? ")" )* ;
+    // call          → primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
     private fun call(): Expr {
         var expr: Expr = primary()
         while (true) {
