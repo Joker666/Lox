@@ -370,6 +370,9 @@ internal class Parser(private val tokens: List<Token>) {
         if (match(FALSE)) return Expr.Literal(false)
         if (match(TRUE)) return Expr.Literal(true)
         if (match(NIL)) return Expr.Literal(null)
+
+        // in Lox a literal expression is either a string or a number, that has a value associated
+        // with the token
         if (match(NUMBER, STRING)) {
             return Expr.Literal(previous().literal)
         }
