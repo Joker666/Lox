@@ -1,5 +1,5 @@
-internal class LoxClass(val name: String) : LoxCallable {
-    private val methods = mutableMapOf<String, LoxFunction>()
+internal class LoxClass(val name: String, private val methods: MutableMap<String, LoxFunction>) :
+    LoxCallable {
 
     fun findMethod(name: String): LoxFunction? {
         return methods[name]
@@ -16,8 +16,8 @@ internal class LoxClass(val name: String) : LoxCallable {
 
     override fun call(interpreter: Interpreter, args: List<Any?>): Any? {
         val instance = LoxInstance(this)
-        val initializer = findMethod("init")
-        initializer?.bind(instance)?.call(interpreter, args)
+        //        val initializer = findMethod("init")
+        //        initializer?.bind(instance)?.call(interpreter, args)
         return instance
     }
 
@@ -34,10 +34,10 @@ internal class LoxInstance(private val klass: LoxClass) {
             return fields[name.lexeme]
         }
 
-        val method = klass.findMethod(name.lexeme)
-        if (method != null) {
-            return method.bind(this)
-        }
+        //        val method = klass.findMethod(name.lexeme)
+        //        if (method != null) {
+        //            return method.bind(this)
+        //        }
 
         throw RuntimeError(name, "Undefined property '${name.lexeme}'.")
     }
