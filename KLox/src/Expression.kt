@@ -19,5 +19,7 @@ abstract class Expr {
 
     internal class Set(val loxObject: Expr, val name: Token, val value: Expr) : Expr()
 
+    internal class This(val keyword: Token) : Expr()
+
     object Empty : Expr()
 }

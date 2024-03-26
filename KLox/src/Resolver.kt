@@ -37,12 +37,16 @@ class Resolver(private val interpreter: Interpreter) {
             is Stmt.Class -> {
                 declare(stmt.name)
 
+                beginScope()
+                scopes.peek()["this"] = true
+
                 for (method in stmt.methods) {
                     val declaration: FunctionType = FunctionType.METHOD
                     resolveFunction(method, declaration)
                 }
 
                 define(stmt.name)
+                endScope()
             }
             is Stmt.Return -> {
                 if (currentFunction == FunctionType.NONE) {
@@ -104,6 +108,13 @@ class Resolver(private val interpreter: Interpreter) {
             is Expr.Set -> {
                 resolveExpr(expr.loxObject)
                 resolveExpr(expr.value)
+            }
+            is Expr.This -> {
+                if (currentFunction == FunctionType.NONE) {
+                    Lox.error(expr.keyword, "Can't use 'this' outside of a class.")
+                } else {
+                    resolveLocal(expr, expr.keyword)
+                }
             }
             is Expr.Grouping -> resolveExpr(expr.expression)
             is Expr.Literal -> {

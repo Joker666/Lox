@@ -381,6 +381,9 @@ internal class Parser(private val tokens: List<Token>) {
             consume(RIGHT_PAREN, "Expect ')' after expression.")
             return Expr.Grouping(expr)
         }
+        if (match(THIS)) {
+            return Expr.This(previous())
+        }
         if (match(IDENTIFIER)) {
             return Expr.Variable(previous())
         }
