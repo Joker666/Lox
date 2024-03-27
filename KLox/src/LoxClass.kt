@@ -14,10 +14,10 @@ internal class LoxClass(val name: String, private val methods: MutableMap<String
         return initializer?.arity() ?: 0
     }
 
-    override fun call(interpreter: Interpreter, args: List<Any?>): Any? {
+    override fun call(interpreter: Interpreter, args: List<Any?>): Any {
         val instance = LoxInstance(this)
-        //        val initializer = findMethod("init")
-        //        initializer?.bind(instance)?.call(interpreter, args)
+        val initializer = findMethod("init")
+        initializer?.bind(instance)?.call(interpreter, args)
         return instance
     }
 
