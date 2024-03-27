@@ -181,6 +181,7 @@ class Interpreter {
                     throw RuntimeError(expr.name, "Only instances have fields.")
                 }
             }
+            is Expr.This -> lookUpVariable(expr.keyword, expr)
             is Expr.Variable -> lookUpVariable(expr.name, expr)
             is Expr.Assign -> {
                 val value = evaluate(expr.value)

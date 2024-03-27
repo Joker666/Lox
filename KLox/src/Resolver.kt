@@ -36,6 +36,7 @@ class Resolver(private val interpreter: Interpreter) {
             }
             is Stmt.Class -> {
                 declare(stmt.name)
+                define(stmt.name)
 
                 beginScope()
                 scopes.peek()["this"] = true
@@ -45,7 +46,6 @@ class Resolver(private val interpreter: Interpreter) {
                     resolveFunction(method, declaration)
                 }
 
-                define(stmt.name)
                 endScope()
             }
             is Stmt.Return -> {
