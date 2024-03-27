@@ -6,10 +6,17 @@ private enum class FunctionType {
     FUNCTION
 }
 
+private enum class ClassType {
+    NONE,
+    CLASS,
+    SUBCLASS
+}
+
 class Resolver(private val interpreter: Interpreter) {
     // Each element in the stack is a Map representing a single block scope.
     private val scopes = Stack<MutableMap<String, Boolean>>()
     private var currentFunction = FunctionType.NONE
+    private var currentClass = ClassType.NONE
 
     internal fun resolve(statements: List<Stmt>) {
         statements.forEach { resolveStmt(it) }
@@ -35,6 +42,9 @@ class Resolver(private val interpreter: Interpreter) {
                 resolveFunction(stmt, FunctionType.FUNCTION)
             }
             is Stmt.Class -> {
+                val enclosingClass = currentClass
+                currentClass = ClassType.CLASS
+
                 declare(stmt.name)
                 define(stmt.name)
 
@@ -47,6 +57,7 @@ class Resolver(private val interpreter: Interpreter) {
                 }
 
                 endScope()
+                currentClass = enclosingClass
             }
             is Stmt.Return -> {
                 if (currentFunction == FunctionType.NONE) {
@@ -110,7 +121,7 @@ class Resolver(private val interpreter: Interpreter) {
                 resolveExpr(expr.value)
             }
             is Expr.This -> {
-                if (currentFunction == FunctionType.NONE) {
+                if (currentClass == ClassType.NONE) {
                     Lox.error(expr.keyword, "Can't use 'this' outside of a class.")
                 } else {
                     resolveLocal(expr, expr.keyword)
