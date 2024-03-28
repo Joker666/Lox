@@ -11,7 +11,7 @@ abstract class Expr {
 
     internal class Unary(val operator: Token, val right: Expr) : Expr()
 
-    internal class Variable(val name: Token) : Expr()
+    class Variable(val name: Token) : Expr()
 
     internal class Assign(val name: Token, val value: Expr) : Expr()
 
