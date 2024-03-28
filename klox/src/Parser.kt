@@ -37,7 +37,7 @@ internal class Parser(private val tokens: List<Token>) {
         }
     }
 
-    // classDecl     → "class" IDENTIFIER "{" function* "}" ;
+    // classDecl     → "class" IDENTIFIER ( "<" IDENTIFIER )? "{" function* "}" ;
     private fun classDeclaration(): Stmt {
         val name = consume(IDENTIFIER, "Expect class name.")
         var superclass: Expr.Variable? = null
