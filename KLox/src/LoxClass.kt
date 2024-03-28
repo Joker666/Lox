@@ -5,10 +5,6 @@ internal class LoxClass(val name: String, private val methods: MutableMap<String
         return methods[name]
     }
 
-    fun addMethod(name: String, method: LoxFunction) {
-        methods[name] = method
-    }
-
     override fun arity(): Int {
         val initializer = findMethod("init")
         return initializer?.arity() ?: 0
