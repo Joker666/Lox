@@ -19,7 +19,7 @@ abstract class Stmt {
 
     class Block(val statements: List<Stmt>) : Stmt()
 
-    class Class(val name: Token, superclass: Expr.Variable?, val methods: List<Function>) : Stmt()
+    class Class(val name: Token, val superclass: Expr.Variable?, val methods: List<Function>) : Stmt()
 
     object Empty : Stmt()
 }

@@ -68,6 +68,14 @@ class Interpreter {
 
     // executeClass executes a class statement.
     private fun executeClass(stmt: Stmt.Class) {
+        var superclass: Any? = null
+        if (stmt.superclass != null) {
+            superclass = evaluate(stmt.superclass)
+            if (superclass !is LoxClass) {
+                throw RuntimeError(stmt.superclass.name, "Superclass must be a class.")
+            }
+        }
+
         environment.define(stmt.name.lexeme, null)
 
         val methods: MutableMap<String, LoxFunction> = HashMap()
@@ -78,7 +86,7 @@ class Interpreter {
 
         // That two-stage variable binding process allows references to the class inside its own
         // methods.
-        val klass = LoxClass(stmt.name.lexeme, methods)
+        val klass = LoxClass(stmt.name.lexeme, superclass as LoxClass?, methods)
         environment.assign(stmt.name, klass)
     }
 

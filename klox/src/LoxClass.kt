@@ -1,4 +1,4 @@
-internal class LoxClass(val name: String, private val methods: MutableMap<String, LoxFunction>) :
+internal class LoxClass(val name: String, val superclass: LoxClass?, private val methods: MutableMap<String, LoxFunction>) :
     LoxCallable {
 
     fun findMethod(name: String): LoxFunction? {
