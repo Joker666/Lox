@@ -20,6 +20,11 @@ internal class LoxFunction(
         try {
             interpreter.executeBlock(declaration.body, environment)
         } catch (returnValue: ReturnException) {
+            // If we’re in an initializer and execute a return statement, instead of returning the
+            // value (which will always be nil), we again return this.
+            if (isInitializer) {
+                return closure.getAt(0, "this")
+            }
             return returnValue.value
         }
 
