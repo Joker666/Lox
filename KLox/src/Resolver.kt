@@ -3,7 +3,8 @@ import java.util.*
 private enum class FunctionType {
     NONE,
     METHOD,
-    FUNCTION
+    FUNCTION,
+    INITIALIZER
 }
 
 private enum class ClassType {
@@ -52,7 +53,11 @@ class Resolver(private val interpreter: Interpreter) {
                 scopes.peek()["this"] = true
 
                 for (method in stmt.methods) {
-                    val declaration: FunctionType = FunctionType.METHOD
+                    var declaration: FunctionType = FunctionType.METHOD
+                    if (method.name.lexeme == "init") {
+                        declaration = FunctionType.INITIALIZER
+                    }
+
                     resolveFunction(method, declaration)
                 }
 
@@ -64,7 +69,13 @@ class Resolver(private val interpreter: Interpreter) {
                     Lox.error(stmt.keyword, "Can't return from top-level code.")
                 }
 
-                stmt.value?.let { resolveExpr(it) }
+                stmt.value?.let {
+                    if (currentFunction == FunctionType.INITIALIZER) {
+                        Lox.error(stmt.keyword, "Can't return a value from an initializer.")
+                    }
+
+                    resolveExpr(it)
+                }
             }
             is Stmt.If -> {
                 // Static analysis analyzes any branch that could be run.
