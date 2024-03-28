@@ -48,7 +48,8 @@ class Interpreter {
                 is Stmt.Expression -> evaluate(it.expression)
                 is Stmt.Print -> println(stringify(evaluate(it.expression)))
                 is Stmt.Var -> environment.define(it.name.lexeme, evaluate(it.initializer))
-                is Stmt.Function -> environment.define(it.name.lexeme, LoxFunction(it, environment))
+                is Stmt.Function ->
+                    environment.define(it.name.lexeme, LoxFunction(it, environment, false))
                 is Stmt.Class -> executeClass(it)
                 is Stmt.Return -> executeReturn(it)
                 is Stmt.Break -> throw BreakException()
@@ -71,7 +72,7 @@ class Interpreter {
 
         val methods: MutableMap<String, LoxFunction> = HashMap()
         for (method in stmt.methods) {
-            val function = LoxFunction(method, environment)
+            val function = LoxFunction(method, environment, method.name.lexeme == "init")
             methods[method.name.lexeme] = function
         }
 
@@ -261,7 +262,7 @@ class Interpreter {
     private fun lookUpVariable(name: Token, expr: Expr): Any? {
         val distance = locals[expr]
         return if (distance != null) {
-            environment.getAt(distance, name)
+            environment.getAt(distance, name.lexeme)
         } else {
             globals.get(name)
         }

@@ -1,6 +1,7 @@
 internal class LoxFunction(
     private val declaration: Stmt.Function,
-    private val closure: Environment
+    private val closure: Environment,
+    private val isInitializer: Boolean,
 ) : LoxCallable {
     override fun arity(): Int {
         return declaration.params.size
@@ -21,13 +22,19 @@ internal class LoxFunction(
         } catch (returnValue: ReturnException) {
             return returnValue.value
         }
+
+        // If the function is an initializer,
+        // we override the actual return value and forcibly return this.
+        if (isInitializer) {
+            return closure.getAt(0, "this")
+        }
         return null
     }
 
     fun bind(instance: LoxInstance?): LoxFunction {
         val environment = Environment(closure)
         environment.define("this", instance)
-        return LoxFunction(declaration, environment)
+        return LoxFunction(declaration, environment, isInitializer)
     }
 
     override fun toString(): String {

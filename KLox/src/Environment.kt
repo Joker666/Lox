@@ -13,8 +13,8 @@ class Environment(private val enclosing: Environment?) {
         }
     }
 
-    fun getAt(distance: Int, name: Token): Any? {
-        return ancestor(distance).values[name.lexeme]
+    fun getAt(distance: Int, name: String): Any? {
+        return ancestor(distance).values[name]
     }
 
     fun assign(name: Token, value: Any?): Unit =
