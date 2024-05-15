@@ -449,7 +449,7 @@ internal class Parser(private val tokens: List<Token>) {
         return previous()
     }
 
-    // consume the current token if it is of the given type
+    // consume the current token and advance if it is of the given type
     // throw an error if the current token is not of the given type
     private fun consume(type: TokenType, message: String): Token {
         if (check(type)) return advance()
