@@ -1,3 +1,4 @@
+import Expr.Super
 import TokenType.*
 
 enum class FunctionKind {
@@ -385,6 +386,12 @@ internal class Parser(private val tokens: List<Token>) {
             val expr = expression()
             consume(RIGHT_PAREN, "Expect ')' after expression.")
             return Expr.Grouping(expr)
+        }
+        if (match(SUPER)) {
+            val keyword = previous()
+            consume(DOT, "Expect '.' after 'super'.")
+            val method = consume(IDENTIFIER, "Expect superclass method name.")
+            return Super(keyword, method)
         }
         if (match(THIS)) {
             return Expr.This(previous())
