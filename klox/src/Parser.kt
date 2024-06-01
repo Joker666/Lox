@@ -368,10 +368,9 @@ internal class Parser(private val tokens: List<Token>) {
         return Expr.Call(callee, paren, arguments)
     }
 
-    // primary       → "true" | "false" | "nil"
-    //               | NUMBER | STRING
-    //               | "(" expression ")"
-    //               | IDENTIFIER ;
+    // primary        → "true" | "false" | "nil" | "this"
+    //               | NUMBER | STRING | IDENTIFIER | "(" expression ")"
+    //               | "super" "." IDENTIFIER ;
     private fun primary(): Expr {
         if (match(FALSE)) return Expr.Literal(false)
         if (match(TRUE)) return Expr.Literal(true)

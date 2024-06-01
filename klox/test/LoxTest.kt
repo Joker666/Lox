@@ -5,16 +5,15 @@ class LoxTest {
     fun run() {
         Lox.run(
             """
-class Cake {
-  taste() {
-    var adjective = "delicious";
-    print "The " + this.flavor + " cake is " + adjective + "!";
+class Doughnut {
+  cook() {
+    print "Fry until golden brown.";
   }
 }
 
-var cake = Cake();
-cake.flavor = "German chocolate";
-cake.taste(); // Prints "The German chocolate cake is delicious!".
+class BostonCream < Doughnut {}
+
+BostonCream().cook();
 """
         )
     }

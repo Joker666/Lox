@@ -1,8 +1,12 @@
-internal class LoxClass(val name: String, val superclass: LoxClass?, private val methods: MutableMap<String, LoxFunction>) :
-    LoxCallable {
+internal class LoxClass(
+    val name: String,
+    private val superclass: LoxClass?,
+    private val methods: MutableMap<String, LoxFunction>
+) : LoxCallable {
 
+    // We look for a method on the current class before walking up the superclass chain.
     fun findMethod(name: String): LoxFunction? {
-        return methods[name]
+        return methods[name] ?: superclass?.findMethod(name)
     }
 
     override fun arity(): Int {

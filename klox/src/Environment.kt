@@ -31,7 +31,7 @@ class Environment(private val enclosing: Environment?) {
     // This walks a fixed number of hops up the parent chain and returns the environment there
     private fun ancestor(distance: Int): Environment {
         var environment: Environment = this
-        for (i in 0 ..< distance) {
+        for (i in 0..<distance) {
             environment = environment.enclosing!!
         }
 
