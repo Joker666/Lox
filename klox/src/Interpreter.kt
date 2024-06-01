@@ -39,6 +39,7 @@ class Interpreter {
                 if (floor(obj) == obj) { // convert 5.0 => 5
                     obj.toInt().toString()
                 } else obj.toString()
+
             else -> obj.toString()
         }
 
@@ -50,6 +51,7 @@ class Interpreter {
                 is Stmt.Var -> environment.define(it.name.lexeme, evaluate(it.initializer))
                 is Stmt.Function ->
                     environment.define(it.name.lexeme, LoxFunction(it, environment, false))
+
                 is Stmt.Class -> executeClass(it)
                 is Stmt.Return -> executeReturn(it)
                 is Stmt.Break -> throw BreakException()
@@ -157,6 +159,7 @@ class Interpreter {
                     else -> null
                 }
             }
+
             is Expr.Call -> {
                 val callee = evaluate(expr.callee)
                 val arguments = expr.arguments.map { evaluate(it) }
@@ -172,6 +175,7 @@ class Interpreter {
                     throw RuntimeError(expr.paren, "Can only call functions and classes.")
                 }
             }
+
             is Expr.Get -> {
                 val obj = evaluate(expr.loxObject)
                 if (obj is LoxInstance) {
@@ -180,6 +184,7 @@ class Interpreter {
                     throw RuntimeError(expr.name, "Only instances have properties.")
                 }
             }
+
             is Expr.Set -> {
                 val obj = evaluate(expr.loxObject)
                 if (obj is LoxInstance) {
@@ -190,6 +195,7 @@ class Interpreter {
                     throw RuntimeError(expr.name, "Only instances have fields.")
                 }
             }
+
             is Expr.This -> lookUpVariable(expr.keyword, expr)
             is Expr.Variable -> lookUpVariable(expr.name, expr)
             is Expr.Assign -> {
@@ -204,6 +210,7 @@ class Interpreter {
 
                 value
             }
+
             is Expr.Logical -> {
                 val left = evaluate(expr.left)
                 if (expr.operator.type == TokenType.OR) {
@@ -213,6 +220,7 @@ class Interpreter {
                 }
                 return evaluate(expr.right) // recursion
             }
+
             is Expr.Binary -> {
                 val left = evaluate(expr.left)
                 val right = evaluate(expr.right)
@@ -221,6 +229,7 @@ class Interpreter {
                         checkNumberOperands(expr.operator, left, right)
                         left as Double - right as Double
                     }
+
                     TokenType.PLUS -> {
                         if (left is Double && right is Double) left + right // Handle numbers
                         else if (left is String && right is String)
@@ -231,35 +240,43 @@ class Interpreter {
                                 "Operands must be numbers or strings."
                             )
                     }
+
                     TokenType.STAR -> {
                         checkNumberOperands(expr.operator, left, right)
                         left as Double * right as Double
                     }
+
                     TokenType.SLASH -> {
                         checkNumberOperands(expr.operator, left, right)
                         left as Double / right as Double
                     }
+
                     TokenType.GREATER -> {
                         checkNumberOperands(expr.operator, left, right)
                         left as Double > right as Double
                     }
+
                     TokenType.GREATER_EQUAL -> {
                         checkNumberOperands(expr.operator, left, right)
                         left as Double >= right as Double
                     }
+
                     TokenType.LESS -> {
                         checkNumberOperands(expr.operator, left, right)
                         (left as Double) < right as Double
                     }
+
                     TokenType.LESS_EQUAL -> {
                         checkNumberOperands(expr.operator, left, right)
                         left as Double <= right as Double
                     }
+
                     TokenType.BANG_EQUAL -> !isEqual(left, right)
                     TokenType.EQUAL_EQUAL -> isEqual(left, right)
                     else -> null
                 }
             }
+
             else -> null
         }
     }

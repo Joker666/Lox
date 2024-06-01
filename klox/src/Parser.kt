@@ -416,6 +416,7 @@ internal class Parser(private val tokens: List<Token>) {
                 WHILE,
                 PRINT,
                 RETURN -> return
+
                 else -> {
                     advance()
                 }
