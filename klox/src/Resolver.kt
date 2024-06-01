@@ -32,7 +32,6 @@ class Resolver(private val interpreter: Interpreter) {
                 resolveExpr(stmt.initializer)
                 define(stmt.name)
             }
-
             is Stmt.Function -> {
                 // Unlike variables, we define the name eagerly,
                 // before resolving the function’s body.
@@ -43,7 +42,6 @@ class Resolver(private val interpreter: Interpreter) {
                 // In a static analysis, we immediately traverse into the body right then and there.
                 resolveFunction(stmt, FunctionType.FUNCTION)
             }
-
             is Stmt.Class -> {
                 val enclosingClass = currentClass
                 currentClass = ClassType.CLASS
@@ -56,7 +54,12 @@ class Resolver(private val interpreter: Interpreter) {
                 }
 
                 if (stmt.superclass != null) {
+                    currentClass = ClassType.SUBCLASS
                     resolveExpr(stmt.superclass)
+                }
+                if (stmt.superclass != null) {
+                    beginScope()
+                    scopes.peek()["super"] = true
                 }
 
                 beginScope()
@@ -71,10 +74,16 @@ class Resolver(private val interpreter: Interpreter) {
                     resolveFunction(method, declaration)
                 }
 
+                // end this scope
                 endScope()
+
+                // end superclass scope
+                if (stmt.superclass != null) {
+                    endScope()
+                }
+
                 currentClass = enclosingClass
             }
-
             is Stmt.Return -> {
                 if (currentFunction == FunctionType.NONE) {
                     Lox.error(stmt.keyword, "Can't return from top-level code.")
@@ -88,7 +97,6 @@ class Resolver(private val interpreter: Interpreter) {
                     resolveExpr(it)
                 }
             }
-
             is Stmt.If -> {
                 // Static analysis analyzes any branch that could be run.
                 // Since either one could be reached at runtime, we resolve both.
@@ -96,18 +104,15 @@ class Resolver(private val interpreter: Interpreter) {
                 resolveStmt(stmt.thenBranch)
                 if (stmt.elseBranch != null) resolveStmt(stmt.elseBranch)
             }
-
             is Stmt.While -> {
                 resolveExpr(stmt.condition)
                 resolveStmt(stmt.body)
             }
-
             is Stmt.Block -> {
                 beginScope()
                 resolve(stmt.statements)
                 endScope()
             }
-
             else -> {} // do nothing, we don't care about other statements yet.
         }
     }
@@ -127,30 +132,34 @@ class Resolver(private val interpreter: Interpreter) {
                     resolveLocal(expr, expr.name)
                 }
             }
-
             is Expr.Assign -> {
                 // First, we resolve the expression for the assigned value in case
                 // it also contains references to other variables.
                 resolveExpr(expr.value)
                 resolveLocal(expr, expr.name)
             }
-
             is Expr.Binary -> {
                 resolveExpr(expr.left)
                 resolveExpr(expr.right)
             }
-
             is Expr.Call -> {
                 resolveExpr(expr.callee)
                 expr.arguments.forEach { resolveExpr(it) }
             }
-
             is Expr.Get -> resolveExpr(expr.loxObject)
             is Expr.Set -> {
                 resolveExpr(expr.loxObject)
                 resolveExpr(expr.value)
             }
-
+            is Expr.Super -> {
+                if (currentClass == ClassType.NONE) {
+                    Lox.error(expr.keyword, "Can't use 'super' outside of a class.")
+                } else if (currentClass != ClassType.SUBCLASS) {
+                    Lox.error(expr.keyword, "Can't use 'super' in a class with no superclass.")
+                } else {
+                    resolveLocal(expr, expr.keyword)
+                }
+            }
             is Expr.This -> {
                 if (currentClass == ClassType.NONE) {
                     Lox.error(expr.keyword, "Can't use 'this' outside of a class.")
@@ -158,18 +167,15 @@ class Resolver(private val interpreter: Interpreter) {
                     resolveLocal(expr, expr.keyword)
                 }
             }
-
             is Expr.Grouping -> resolveExpr(expr.expression)
             is Expr.Literal -> {
                 // A literal expression does not mention any variables and
                 // does not contain any subexpressions so there is no work to do.
             }
-
             is Expr.Logical -> {
                 resolveExpr(expr.left)
                 resolveExpr(expr.right)
             }
-
             is Expr.Unary -> resolveExpr(expr.right)
             else -> {} // do nothing, we don't care about other expressions yet.
         }
