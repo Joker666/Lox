@@ -11,6 +11,9 @@ internal class Parser(private val tokens: List<Token>) {
     private class ParseError : RuntimeException()
 
     private var index = 0
+
+    // loopDepth is used to keep track of the depth of nested loops.
+    // It is useful for checking if break statements are inside of loops.
     private var loopDepth = 0
 
     fun parse(): List<Stmt> {
@@ -422,7 +425,6 @@ internal class Parser(private val tokens: List<Token>) {
                 WHILE,
                 PRINT,
                 RETURN -> return
-
                 else -> {
                     advance()
                 }
